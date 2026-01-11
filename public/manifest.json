@@ -1,0 +1,17 @@
+{
+  "name": "Roster Moment",
+  "short_name": "Roster",
+  "description": "Crea tu póster épico con el equipo de Cloud9",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a192f",
+  "theme_color": "#0a192f",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Gaupasamaker/Cloud9-Roster-Moment/main/public/javascript.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

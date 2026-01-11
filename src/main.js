@@ -283,3 +283,21 @@ window.resetApp = () => {
 
 // Initial render
 render();
+
+// Registro del Service Worker para PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registrado'))
+      .catch(err => console.log('Fallo al registrar Service Worker', err));
+  });
+}
+
+// Lógica para el botón de instalación (PWA)
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('App lista para ser instalada');
+  // Aquí podrías mostrar un botón de instalación en la UI si quisieras
+});
