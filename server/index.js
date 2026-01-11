@@ -187,7 +187,7 @@ app.post('/generate', async (req, res) => {
   
   try {
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash'
+      model: 'gemini-3-pro-image-preview'
     });
 
     // 1. Cargar fotos de los jugadores desde el servidor

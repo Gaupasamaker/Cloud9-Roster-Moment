@@ -176,15 +176,15 @@ window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
   const currentIndex = screenKeys.indexOf(state.currentScreen);
   
-  if (state.currentScreen === 'email') {
-    // 1. Mostrar pantalla de carga inmediatamente
+  // El trigger ahora es la pantalla 'style' (donde está el botón "Ver Resultado")
+  if (state.currentScreen === 'style') {
     state.currentScreen = 'generating';
     render();
     
     const statusLog = document.getElementById('status-log');
     
     try {
-      if(statusLog) statusLog.innerText = `Llamando a: ${API_URL}...`;
+      if(statusLog) statusLog.innerText = `Conectando con el servidor de IA...`;
       
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
