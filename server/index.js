@@ -255,15 +255,22 @@ app.post('/generate', async (req, res) => {
     
     console.log('Respuesta recibida de Google AI');
     const response = result.response;
-    console.log('Candidates:', JSON.stringify(response.candidates, null, 2));
+    
+    // Log detallado de la estructura de la respuesta
+    console.log('Estructura de candidates:', JSON.stringify(response.candidates.map(c => ({
+      index: c.index,
+      parts: c.content.parts.map(p => Object.keys(p))
+    })), null, 2));
     
     let imageUrl = null;
     
     // Buscar la imagen en la respuesta
     if (response.candidates && response.candidates[0] && response.candidates[0].content) {
       for (const part of response.candidates[0].content.parts) {
-        console.log('Part type:', Object.keys(part));
         if (part.inlineData) {
+          console.log('MIME Type recibido:', part.inlineData.mimeType);
+          console.log('Longitud de datos base64:', part.inlineData.data.length);
+          
           const imageData = part.inlineData.data;
           const mimeType = part.inlineData.mimeType;
           const extension = mimeType.split('/')[1] || 'png';
@@ -271,13 +278,18 @@ app.post('/generate', async (req, res) => {
           const fileName = `roster_${Date.now()}.${extension}`;
           const filePath = path.join(generatedDir, fileName);
           
-          fs.writeFileSync(filePath, Buffer.from(imageData, 'base64'));
+          // Verificamos el buffer antes de escribir
+          const buffer = Buffer.from(imageData, 'base64');
+          console.log('Tamaño del buffer creado:', buffer.length, 'bytes');
           
-          imageUrl = `http://${LOCAL_IP}:${PORT}/generated/${fileName}`;
-          console.log('Imagen guardada:', imageUrl);
+          fs.writeFileSync(filePath, buffer);
+          
+          imageUrl = `https://${req.get('host')}/generated/${fileName}`;
+          console.log('Imagen guardada y accesible en:', imageUrl);
 
           // Enviar email automáticamente
           if (email) {
+            console.log('Iniciando envío de email a:', email);
             sendPosterEmail(email, filePath);
           }
           break;
