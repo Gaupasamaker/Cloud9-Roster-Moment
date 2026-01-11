@@ -35,20 +35,19 @@ const screens = {
   `,
   style: () => `
     <div class="screen">
-      <h2>Elige un Estilo</h2>
+      <h2>Elige un Estilo y Email</h2>
       <div class="grid">
-        <button onclick="setStyle('Painted Hype')">🎨 Painted Hype</button>
-        <button onclick="setStyle('Hype Match Day')">⚡ Hype Match Day</button>
-        <button onclick="setStyle('Social Media Avatar')">👤 Social Media Avatar</button>
+        <button class="style-btn" id="style-Painted-Hype" onclick="state.style = 'Painted Hype'; updateStyleSelection()">🎨 Painted Hype</button>
+        <button class="style-btn" id="style-Hype-Match-Day" onclick="state.style = 'Hype Match Day'; updateStyleSelection()">⚡ Hype Match Day</button>
+        <button class="style-btn" id="style-Social-Media-Avatar" onclick="state.style = 'Social Media Avatar'; updateStyleSelection()">👤 Social Media Avatar</button>
       </div>
-      <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
-    </div>
-  `,
-  email: () => `
-    <div class="screen">
-      <h2>Tu Email</h2>
-      <input type="email" id="emailInput" placeholder="ejemplo@correo.com" value="${state.email}" oninput="handleEmail(event)">
-      <button onclick="nextScreen()">Ver Resultado</button>
+      
+      <div style="margin-top: 1.5rem; text-align: left;">
+        <label for="emailInput" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Tu Email (para enviarte el póster):</label>
+        <input type="email" id="emailInput" placeholder="ejemplo@correo.com" value="${state.email}" oninput="handleEmail(event)">
+      </div>
+
+      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f;">Ver Resultado 🏆</button>
       <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
     </div>
   `,
@@ -146,6 +145,21 @@ window.setStyle = (style) => {
   nextScreen();
 };
 
+window.updateStyleSelection = () => {
+  const btns = document.querySelectorAll('.style-btn');
+  btns.forEach(btn => {
+    btn.style.background = 'rgba(100, 255, 218, 0.1)';
+    btn.style.border = '1px solid var(--accent-blue)';
+  });
+  
+  const selectedId = `style-${state.style.replace(/\s+/g, '-')}`;
+  const selectedBtn = document.getElementById(selectedId);
+  if (selectedBtn) {
+    selectedBtn.style.background = 'var(--accent-blue)';
+    selectedBtn.style.color = '#0a192f';
+  }
+};
+
 window.handleEmail = (event) => {
   state.email = event.target.value;
 };
@@ -210,6 +224,12 @@ window.nextScreen = async () => {
     }
   } else if (currentIndex < screenKeys.length - 1) {
     state.currentScreen = screenKeys[currentIndex + 1];
+    
+    // Si pasamos a la pantalla de estilo, resaltar el estilo por defecto
+    if (state.currentScreen === 'style') {
+      setTimeout(updateStyleSelection, 50);
+    }
+    
     render();
   }
 };

@@ -295,21 +295,21 @@ app.post('/generate', async (req, res) => {
               console.log(success ? '✅ Email de fondo enviado' : '❌ Email de fondo falló');
             });
           }
-          break;
+
+          console.log('Enviando respuesta al frontend...');
+          res.json({
+            success: true,
+            message: 'Roster Moment generado',
+            imageUrl,
+            imageBase64: imageData,
+            role,
+            style,
+            email
+          });
+          return;
         }
       }
     }
-    
-    console.log('Enviando respuesta al frontend...');
-    res.json({
-      success: true,
-      message: 'Roster Moment generado',
-      imageUrl,
-      imageBase64: photo && photo.startsWith('data:image') ? imageData : imageData, // Enviamos el base64 de la imagen generada
-      role,
-      style,
-      email
-    });
     
   } catch (error) {
     console.error('=== ERROR ===');
