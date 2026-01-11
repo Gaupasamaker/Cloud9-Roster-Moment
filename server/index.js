@@ -48,13 +48,12 @@ const transporter = nodemailer.createTransport({
 });
 
 // Función para enviar email con el póster
-async function sendPosterEmail(toEmail, imagePath) {
+async function sendPosterEmail(toEmail, imageDataBase64) {
   console.log(`📧 DEBUG: Iniciando proceso de envío a ${toEmail}`);
-  console.log(`📧 DEBUG: Usando SMTP Host: ${process.env.SMTP_HOST}`);
+  console.log(`📧 DEBUG: Usando SMTP Host: ${process.env.SMTP_HOST || 'smtp-relay.brevo.com'}`);
   console.log(`📧 DEBUG: Usando Remitente: ${process.env.EMAIL_FROM}`);
   
   try {
-    // Brevo requiere que el remitente sea un EMAIL verificado, no el ID de usuario del SMTP.
     const senderEmail = process.env.EMAIL_FROM;
     
     if (!senderEmail) {
@@ -70,7 +69,8 @@ async function sendPosterEmail(toEmail, imagePath) {
       attachments: [
         {
           filename: 'roster-moment.png',
-          path: imagePath
+          content: imageDataBase64,
+          encoding: 'base64'
         }
       ]
     };
@@ -81,10 +81,6 @@ async function sendPosterEmail(toEmail, imagePath) {
     return true;
   } catch (error) {
     console.error('❌ DEBUG: ERROR CRÍTICO AL ENVIAR EMAIL:', error.message);
-    console.error('❌ DEBUG: Stack trace:', error.stack);
-    if (error.response) {
-      console.error('❌ DEBUG: Respuesta de error del servidor SMTP:', error.response);
-    }
     return false;
   }
 }
@@ -291,7 +287,8 @@ app.post('/generate', async (req, res) => {
           // Enviar email automáticamente (SIN AWAIT para no bloquear la respuesta)
           if (email) {
             console.log('Iniciando envío de email en segundo plano a:', email);
-            sendPosterEmail(email, filePath).then(success => {
+            // USAR EL BASE64 DIRECTAMENTE EN EL EMAIL PARA EVITAR ENOENT
+            sendPosterEmail(email, imageData).then(success => {
               console.log(success ? '✅ Email de fondo enviado' : '❌ Email de fondo falló');
             });
           }
