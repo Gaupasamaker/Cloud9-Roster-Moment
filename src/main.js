@@ -81,9 +81,9 @@ const screens = {
       <h1>🏆 YOUR ROSTER MOMENT</h1>
       <div class="result-card">
         ${state.generatedImage 
-          ? `<img src="${state.generatedImage}" class="photo-preview-large">`
+          ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado">`
           : state.photo 
-            ? `<img src="${state.photo}" class="photo-preview-large">` 
+            ? `<img src="${state.photo}" class="photo-preview-large" alt="Previsualización de foto">` 
             : '<div class="placeholder-img">No Photo</div>'}
         <h2 class="role-display">${roleEmojis[state.role] || ''} ${state.role.toUpperCase()}</h2>
         <p class="style-name">${state.style}</p>
@@ -152,7 +152,7 @@ const API_URL =
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3001'
-    : 'https://cloud9-roster-moment.onrender.com'; // Sustituir por la URL real de Render/Railway
+    : 'https://cloud9-roster-moment.onrender.com';
 
 window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
