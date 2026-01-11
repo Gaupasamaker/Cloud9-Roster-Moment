@@ -70,8 +70,8 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
       body: JSON.stringify({
         sender: { name: "Roster Moment", email: senderEmail },
         to: [{ email: toEmail }],
-        subject: "¡Tu Roster Moment ya está aquí! 🏆",
-        textContent: "¡Hola! Aquí tienes tu póster épico de Cloud9. ¡Esperamos que te guste!",
+        subject: "Your Roster Moment is here! 🏆",
+        textContent: "Hi! Here is your epic Cloud9 poster. We hope you like it!",
         attachment: [
           {
             name: "roster-moment.png",
@@ -186,11 +186,11 @@ ${negativePrompt}`;
 app.post('/generate', async (req, res) => {
   const { role, style, email, photo } = req.body;
   
-  console.log('=== Nueva solicitud ===');
-  console.log('Rol:', role);
-  console.log('Estilo:', style);
+  console.log('=== New Request ===');
+  console.log('Role:', role);
+  console.log('Style:', style);
   console.log('Email:', email);
-  console.log('Foto recibida:', photo ? 'Sí' : 'No');
+  console.log('Photo received:', photo ? 'Yes' : 'No');
   
   try {
     const model = genAI.getGenerativeModel({ 
@@ -219,7 +219,7 @@ app.post('/generate', async (req, res) => {
         contentParts.push({
           inlineData: { mimeType, data: base64Data }
         });
-        console.log('Imagen del usuario añadida como sujeto principal');
+        console.log('User image added as primary subject');
       }
 
       // Añadir a los jugadores
@@ -235,7 +235,7 @@ app.post('/generate', async (req, res) => {
             data: fileData.toString('base64')
           }
         });
-        console.log(`Jugador añadido: ${file}`);
+        console.log(`Player added: ${file}`);
       }
     } else if (photo && photo.startsWith('data:image')) {
       // Fallback si no hay carpeta de jugadores, solo usamos la del usuario
@@ -252,10 +252,10 @@ app.post('/generate', async (req, res) => {
     // El texto del prompt debe ser la primera parte o estar presente
     contentParts.unshift({ text: prompt });
 
-    console.log('Prompt enviado');
-    console.log('Total imágenes enviadas:', contentParts.length - 1);
+    console.log('Prompt sent');
+    console.log('Total images sent:', contentParts.length - 1);
     
-    console.log('Enviando solicitud a Google AI...');
+    console.log('Sending request to Google AI...');
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: contentParts }],
       generationConfig: {
@@ -263,11 +263,11 @@ app.post('/generate', async (req, res) => {
       },
     });
     
-    console.log('Respuesta recibida de Google AI');
+    console.log('Response received from Google AI');
     const response = result.response;
     
     // Log detallado de la estructura de la respuesta
-    console.log('Estructura de candidates:', JSON.stringify(response.candidates.map(c => ({
+    console.log('Candidates structure:', JSON.stringify(response.candidates.map(c => ({
       index: c.index,
       parts: c.content.parts.map(p => Object.keys(p))
     })), null, 2));
@@ -278,8 +278,8 @@ app.post('/generate', async (req, res) => {
     if (response.candidates && response.candidates[0] && response.candidates[0].content) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
-          console.log('MIME Type recibido:', part.inlineData.mimeType);
-          console.log('Longitud de datos base64:', part.inlineData.data.length);
+          console.log('MIME Type received:', part.inlineData.mimeType);
+          console.log('Base64 data length:', part.inlineData.data.length);
           
           const imageData = part.inlineData.data;
           const mimeType = part.inlineData.mimeType;
@@ -290,25 +290,25 @@ app.post('/generate', async (req, res) => {
           
           // Verificamos el buffer antes de escribir
           const buffer = Buffer.from(imageData, 'base64');
-          console.log('Tamaño del buffer creado:', buffer.length, 'bytes');
+          console.log('Created buffer size:', buffer.length, 'bytes');
           
           imageUrl = `https://cloud9-roster-moment.onrender.com/generated/${fileName}`;
-          console.log('Imagen guardada y accesible en URL pública:', imageUrl);
+          console.log('Image saved and accessible at public URL:', imageUrl);
 
           // Enviar email automáticamente (SIN AWAIT para no bloquear la respuesta)
           if (email) {
-            console.log('Iniciando envío de email en segundo plano a:', email);
+            console.log('Starting background email send to:', email);
             // USAR EL BASE64 DIRECTAMENTE EN EL EMAIL PARA EVITAR ENOENT
             sendPosterEmail(email, imageData).then(success => {
-              console.log(success ? '✅ Email de fondo enviado' : '❌ Email de fondo falló');
+              console.log(success ? '✅ Background email sent' : '❌ Background email failed');
             });
           }
 
-          console.log('Enviando respuesta al frontend...');
+          console.log('Sending response to frontend...');
           // USAR imageData directamente que está definido en el scope del for
           res.json({
             success: true,
-            message: 'Roster Moment generado',
+            message: 'Roster Moment generated',
             imageUrl,
             imageName: fileName, // Enviamos el nombre del archivo para el QR
             imageBase64: imageData,
@@ -322,20 +322,20 @@ app.post('/generate', async (req, res) => {
     }
 
     // SEGURIDAD: Si llegamos aquí sin haber enviado respuesta (ej. no hubo inlineData)
-    console.warn('⚠️ No se encontró inlineData en la respuesta de Google AI');
+    console.warn('⚠️ No inlineData found in Google AI response');
     res.status(500).json({
       success: false,
-      message: 'La IA no generó una imagen válida. Intenta con otro estilo.',
+      message: 'The AI did not generate a valid image. Try with another style.',
       error: 'Missing inlineData'
     });
     
   } catch (error) {
     console.error('=== ERROR ===');
-    console.error('Mensaje:', error.message);
+    console.error('Message:', error.message);
     console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Error generando imagen',
+      message: 'Error generating image',
       error: error.message
     });
   }
@@ -346,7 +346,7 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🎮 Roster Moment Backend corriendo en:`);
+  console.log(`🎮 Roster Moment Backend running at:`);
   console.log(`   Local:   http://localhost:${PORT}`);
-  console.log(`   Red:     http://${LOCAL_IP}:${PORT}`);
+  console.log(`   Network: http://${LOCAL_IP}:${PORT}`);
 });

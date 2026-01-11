@@ -14,7 +14,7 @@ const screens = {
   role: () => `
     <div class="screen">
       <h1>🎮 Roster Moment</h1>
-      <h2>Selecciona tu Rol</h2>
+      <h2>Select your Role</h2>
       <div class="grid">
         <button onclick="setRole('Top')">🛡️ Top</button>
         <button onclick="setRole('Jungle')">🌿 Jungle</button>
@@ -26,17 +26,17 @@ const screens = {
   `,
   photo: () => `
     <div class="screen">
-      <h2>Sube tu Foto</h2>
+      <h2>Upload your Photo</h2>
       <input type="file" accept="image/*" capture="user" id="photoInput" onchange="handlePhoto(event)">
       <div id="previewContainer"></div>
-      <button onclick="nextScreen()" id="nextBtn" disabled>Siguiente</button>
-      <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
+      <button onclick="nextScreen()" id="nextBtn" disabled>Next</button>
+      <button class="secondary-btn" onclick="prevScreen()">Back</button>
     </div>
   `,
   style: () => {
     return `
     <div class="screen">
-      <h2>Elige un Estilo y Email</h2>
+      <h2>Choose a Style and Email</h2>
       <div class="grid">
         <button class="style-btn" 
                 id="style-Painted-Hype" 
@@ -50,22 +50,22 @@ const screens = {
       </div>
       
       <div style="margin-top: 1.5rem; text-align: left;">
-        <label for="emailInput" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Tu Email (para enviarte el póster):</label>
-        <input type="email" id="emailInput" placeholder="ejemplo@correo.com" value="${state.email}" oninput="handleEmail(event)">
+        <label for="emailInput" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Your Email (to send you the poster):</label>
+        <input type="email" id="emailInput" placeholder="example@email.com" value="${state.email}" oninput="handleEmail(event)">
       </div>
-
-      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f;">Ver Resultado 🏆</button>
-      <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
+      
+      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f;">View Result 🏆</button>
+      <button class="secondary-btn" onclick="prevScreen()">Back</button>
     </div>
   `;
   },
   generating: () => `
     <div class="screen generating-screen">
       <div class="loader"></div>
-      <h2>Generando tu Roster Moment...</h2>
-      <p class="generating-text">Creando tu póster épico</p>
+      <h2>Generating your Roster Moment...</h2>
+      <p class="generating-text">Creating your epic poster</p>
       <div id="status-log" style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5; color: #64ffda;">
-        Iniciando conexión con el servidor...
+        Connecting to the server...
       </div>
     </div>
   `,
@@ -112,12 +112,12 @@ const screens = {
 
       ${state.generatedImage ? `
         <div class="qr-section">
-          <p class="qr-label">📱 Escanea para obtener tu imagen</p>
+          <p class="qr-label">📱 Scan to get your image</p>
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrUrl)}" alt="QR Code" class="qr-image">
         </div>
       ` : ''}
-      <div class="email-sent">📧 Registrado: ${state.email}</div>
-      <button onclick="resetApp()">🔄 Crear otra</button>
+      <div class="email-sent">📧 Registered: ${state.email}</div>
+      <button onclick="resetApp()">🔄 Create Another</button>
     </div>
   `;
   }
@@ -205,7 +205,7 @@ window.nextScreen = async () => {
     const statusLog = document.getElementById('status-log');
     
     try {
-      if(statusLog) statusLog.innerText = `Conectando con el servidor de IA...`;
+      if(statusLog) statusLog.innerText = `Connecting to the AI server...`;
       
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
@@ -220,14 +220,14 @@ window.nextScreen = async () => {
         })
       });
 
-      if(statusLog) statusLog.innerText = 'Recibiendo respuesta de la IA...';
+      if(statusLog) statusLog.innerText = 'Receiving AI response...';
 
       if (!response.ok) {
-        throw new Error(`Error en la petición: ${response.status}`);
+        throw new Error(`Request error: ${response.status}`);
       }
       
       const data = await response.json();
-      if(statusLog) statusLog.innerText = '¡Imagen generada con éxito!';
+      if(statusLog) statusLog.innerText = 'Image generated successfully!';
       
       if (data.imageUrl) {
         state.generatedImage = data.imageUrl;
