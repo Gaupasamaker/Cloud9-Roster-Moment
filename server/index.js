@@ -45,6 +45,14 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
     return false;
   }
 
+  // Debug de la clave (enmascarada)
+  console.log(`📧 DEBUG: API Key cargada. Longitud: ${apiKey.length}`);
+  if (apiKey.length > 10) {
+    console.log(`📧 DEBUG: Clave empieza por: ${apiKey.substring(0, 6)}... y termina en: ...${apiKey.substring(apiKey.length - 4)}`);
+  } else {
+    console.log(`📧 DEBUG: Clave sospechosamente corta: ${apiKey}`);
+  }
+
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -155,10 +163,13 @@ AVOID:
 - Text that is not "Cloud9"
 - Mismatched lighting`;
 
-  return `STRICT IDENTITY PRESERVATION MODE:
-${mandatoryMandate}
+  return `CRITICAL: STRICT IDENTITY PRESERVATION MODE.
+DO NOT USE ANY PRE-TRAINED KNOWLEDGE OF CLOUD9 PLAYERS.
+ONLY USE THE PROVIDED IMAGES (Image 2 to ${playersCount + 1}) FOR THE PRO PLAYERS' FACES.
+The faces in the final image MUST be exact artistic representations of the provided photos. 
+IGNORE any famous faces you might know and stick ONLY to the visual blueprints provided in the input images.
 
-Use the provided images as visual blueprints.
+${mandatoryMandate}
 
 ${style === 'Social Media Avatar' ? 'CREATE AN INDIVIDUAL PORTRAIT' : basePrompt}
 
