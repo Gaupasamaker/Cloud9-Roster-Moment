@@ -33,7 +33,11 @@ const screens = {
       <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
     </div>
   `,
-  style: () => `
+  style: () => {
+    // Pequeño hack para asegurar que el estilo seleccionado se resalte al cargar la pantalla
+    setTimeout(updateStyleSelection, 100);
+
+    return `
     <div class="screen">
       <h2>Elige un Estilo y Email</h2>
       <div class="grid">
@@ -50,7 +54,8 @@ const screens = {
       <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f;">Ver Resultado 🏆</button>
       <button class="secondary-btn" onclick="prevScreen()">Atrás</button>
     </div>
-  `,
+  `;
+  },
   generating: () => `
     <div class="screen generating-screen">
       <div class="loader"></div>

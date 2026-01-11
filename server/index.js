@@ -297,6 +297,7 @@ app.post('/generate', async (req, res) => {
           }
 
           console.log('Enviando respuesta al frontend...');
+          // USAR imageData directamente que está definido en el scope del for
           res.json({
             success: true,
             message: 'Roster Moment generado',
