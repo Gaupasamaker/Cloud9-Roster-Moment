@@ -147,22 +147,20 @@ window.handleEmail = (event) => {
   state.email = event.target.value;
 };
 
-// Configuración de la API - Cambiar por la URL de producción al desplegar el backend
-const API_URL =
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3001'
-    : 'https://cloud9-roster-moment.onrender.com';
+// Configuración de la API - URL de Render para producción
+const API_URL = 'https://cloud9-roster-moment.onrender.com';
 
 window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
   const currentIndex = screenKeys.indexOf(state.currentScreen);
   
   if (state.currentScreen === 'email') {
+    // 1. Mostrar pantalla de carga inmediatamente
     state.currentScreen = 'generating';
     render();
     
     try {
+      console.log('Enviando datos a:', `${API_URL}/generate`);
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
         headers: {
@@ -175,6 +173,10 @@ window.nextScreen = async () => {
           photo: state.photoBase64
         })
       });
+
+      if (!response.ok) {
+        throw new Error(`Error en la petición: ${response.status}`);
+      }
       
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
@@ -182,12 +184,11 @@ window.nextScreen = async () => {
       if (data.imageUrl) {
         state.generatedImage = data.imageUrl;
       }
-      
-      state.currentScreen = 'result';
-      render();
     } catch (error) {
-      console.error('Error:', error);
-      // Aunque falle, mostramos el resultado
+      console.error('Error detallado:', error);
+      alert('Hubo un problema al conectar con el servidor de IA. Mostrando preview original.');
+    } finally {
+      // 2. Ir a la pantalla de resultados pase lo que pase al terminar el fetch
       state.currentScreen = 'result';
       render();
     }
