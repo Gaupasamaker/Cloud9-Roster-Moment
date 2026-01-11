@@ -6,7 +6,6 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
-import nodemailer from 'nodemailer';
 
 // Obtener IP local de la red
 function getLocalIP() {
@@ -33,19 +32,6 @@ const PORT = 3001;
 
 // Inicializar Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-
-// Configurar transportador de Email
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-  port: 2525, // CAMBIO A PUERTO 2525 (Alternativo muy estable para Brevo)
-  secure: false, // TLS en puerto 2525
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-});
 
 // Función para enviar email con el póster usando la API de Brevo (más estable en Render)
 async function sendPosterEmail(toEmail, imageDataBase64) {
@@ -84,14 +70,14 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
     const result = await response.json();
     
     if (response.ok) {
-      console.log('✅ DEBUG: Email enviado con éxito vía API:', result.messageId || 'Success');
+      console.log('✅ Email sent successfully via API:', result.messageId || 'Success');
       return true;
     } else {
-      console.error('❌ DEBUG: Error en la API de Brevo:', JSON.stringify(result));
+      console.error('❌ Error in Brevo API:', JSON.stringify(result));
       return false;
     }
   } catch (error) {
-    console.error('❌ DEBUG: ERROR CRÍTICO AL ENVIAR EMAIL VÍA API:', error.message);
+    console.error('❌ CRITICAL ERROR SENDING EMAIL VIA API:', error.message);
     return false;
   }
 }

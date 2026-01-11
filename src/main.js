@@ -7,7 +7,8 @@ let state = {
   photoBase64: null,
   style: 'Painted Hype',
   email: '',
-  generatedImage: null
+  generatedImage: null,
+  generatedImageName: null
 };
 
 const screens = {
@@ -106,8 +107,8 @@ const screens = {
       
       <!-- Modal para zoom -->
       <div id="imageModal" class="image-modal" onclick="window.closeZoom()">
-        <img src="${state.generatedImage || ''}" class="modal-content" id="modalImg">
-        <button class="close-modal" onclick="window.closeZoom()">Cerrar</button>
+        <img src="${state.generatedImage || ''}" class="modal-content" id="modalImg" alt="Póster ampliado">
+        <button class="close-modal" onclick="window.closeZoom()">Close</button>
       </div>
 
       ${state.generatedImage ? `
@@ -146,7 +147,7 @@ window.handlePhoto = (event) => {
     // Guardar URL para preview
     state.photo = URL.createObjectURL(file);
     const container = document.getElementById('previewContainer');
-    container.innerHTML = `<img src="${state.photo}" class="photo-preview">`;
+    container.innerHTML = `<img src="${state.photo}" class="photo-preview" alt="Preview">`;
     document.getElementById('nextBtn').disabled = false;
     
     // Convertir a base64 para enviar al servidor
@@ -294,10 +295,8 @@ if ('serviceWorker' in navigator) {
 }
 
 // Lógica para el botón de instalación (PWA)
-let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  deferredPrompt = e;
-  console.log('App lista para ser instalada');
-  // Aquí podrías mostrar un botón de instalación en la UI si quisieras
+  console.log('App ready to be installed');
+  // You could store the event here if you wanted to show a custom install button later
 });
