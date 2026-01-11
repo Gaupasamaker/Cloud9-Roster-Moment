@@ -13,12 +13,12 @@ let state = {
   generatedImageName: null
 };
 
-// Datos de jugadores Cloud9 (placeholder - se actualizarán con nombres reales)
+// Datos de jugadores Cloud9
 const PLAYERS = [
-  { id: 'player1', name: 'Fudge', role: 'Top', image: '/api/players/player1.webp' },
+  { id: 'player1', name: 'Thanatos', role: 'Top', image: '/api/players/player1.webp' },
   { id: 'player2', name: 'Blaber', role: 'Jungle', image: '/api/players/player2.webp' },
-  { id: 'player3', name: 'Jojopyun', role: 'Mid', image: '/api/players/player3.webp' },
-  { id: 'player4', name: 'Berserker', role: 'ADC', image: '/api/players/player4.webp' },
+  { id: 'player3', name: 'Zven', role: 'Mid', image: '/api/players/player3.webp' },
+  { id: 'player4', name: 'APA', role: 'ADC', image: '/api/players/player4.webp' },
   { id: 'player5', name: 'Vulcan', role: 'Support', image: '/api/players/player5.webp' }
 ];
 
