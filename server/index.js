@@ -47,6 +47,10 @@ const transporter = nodemailer.createTransport({
 
 // Función para enviar email con el póster
 async function sendPosterEmail(toEmail, imagePath) {
+  console.log(`📧 DEBUG: Iniciando proceso de envío a ${toEmail}`);
+  console.log(`📧 DEBUG: Usando SMTP Host: ${process.env.SMTP_HOST}`);
+  console.log(`📧 DEBUG: Usando Remitente: ${process.env.EMAIL_FROM}`);
+  
   try {
     // Brevo requiere que el remitente sea un EMAIL verificado, no el ID de usuario del SMTP.
     const senderEmail = process.env.EMAIL_FROM;
@@ -55,8 +59,6 @@ async function sendPosterEmail(toEmail, imagePath) {
       console.error('❌ ERROR: EMAIL_FROM no está configurado en el .env');
       return false;
     }
-
-    console.log(`📧 Intentando enviar email desde: ${senderEmail}`);
 
     const mailOptions = {
       from: `"Roster Moment" <${senderEmail}>`,
@@ -71,14 +73,15 @@ async function sendPosterEmail(toEmail, imagePath) {
       ]
     };
 
+    console.log('📧 DEBUG: Llamando a transporter.sendMail...');
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email enviado con éxito:', info.messageId);
-    console.log('📬 Destinatario:', toEmail);
+    console.log('✅ DEBUG: Respuesta de Nodemailer recibida con éxito:', info.messageId);
     return true;
   } catch (error) {
-    console.error('❌ ERROR CRÍTICO AL ENVIAR EMAIL:', error.message);
+    console.error('❌ DEBUG: ERROR CRÍTICO AL ENVIAR EMAIL:', error.message);
+    console.error('❌ DEBUG: Stack trace:', error.stack);
     if (error.response) {
-      console.error('Respuesta de Brevo:', error.response);
+      console.error('❌ DEBUG: Respuesta de error del servidor SMTP:', error.response);
     }
     return false;
   }
