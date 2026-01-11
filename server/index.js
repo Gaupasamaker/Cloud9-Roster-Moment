@@ -37,15 +37,14 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 // Configurar transportador de Email
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-  port: 465, // CAMBIO A PUERTO 465 (SSL DIRECTO)
-  secure: true, // TRUE para puerto 465
+  port: 2525, // CAMBIO A PUERTO 2525 (Alternativo muy estable para Brevo)
+  secure: false, // TLS en puerto 2525
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  connectionTimeout: 10000, // 10 segundos máximo para conectar
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
 });
 
 // Función para enviar email con el póster
@@ -93,14 +92,12 @@ async function sendPosterEmail(toEmail, imagePath) {
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Servir imágenes generadas
-app.use('/generated', express.static(path.join(__dirname, 'generated')));
-
-// Crear carpeta para imágenes si no existe
+// Servir imágenes generadas - Usar ruta absoluta para mayor seguridad
 const generatedDir = path.join(__dirname, 'generated');
 if (!fs.existsSync(generatedDir)) {
-  fs.mkdirSync(generatedDir);
+  fs.mkdirSync(generatedDir, { recursive: true });
 }
+app.use('/generated', express.static(generatedDir));
 
 // Función para generar el prompt según rol y estilo
 function generatePrompt(role, style, hasPhoto = false, playersCount = 0) {
@@ -308,6 +305,7 @@ app.post('/generate', async (req, res) => {
       success: true,
       message: 'Roster Moment generado',
       imageUrl,
+      imageBase64: photo && photo.startsWith('data:image') ? imageData : imageData, // Enviamos el base64 de la imagen generada
       role,
       style,
       email

@@ -192,6 +192,11 @@ window.nextScreen = async () => {
       if (data.imageUrl) {
         state.generatedImage = data.imageUrl;
       }
+      
+      // Fallback: Si el servidor envía la imagen en Base64, usarla (más fiable en producción)
+      if (data.imageBase64) {
+        state.generatedImage = `data:image/jpeg;base64,${data.imageBase64}`;
+      }
     } catch (error) {
       console.error('Error detallado:', error);
       if(statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
