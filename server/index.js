@@ -169,6 +169,13 @@ app.use('/generated', express.static(generatedDir));
 const playersDir = path.join(__dirname, 'assets', 'players');
 app.use('/api/players', express.static(playersDir));
 
+// Servir archivos públicos (dashboard, gallery)
+const publicDir = path.join(__dirname, 'public');
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+  console.log('📁 Serving static files from:', publicDir);
+}
+
 // Función para generar el prompt según rol y estilo
 function generatePrompt(role, style, hasPhoto = false, playersCount = 0) {
 

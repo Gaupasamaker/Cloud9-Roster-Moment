@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud9 Roster Moment - Live Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-bg: #0a192f;
+      --accent-blue: #00aeef;
+      --accent-cyan: #00d4ff;
+      --text-white: #e6f1ff;
+      --text-dim: rgba(255,255,255,0.6);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--primary-bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header img {
+      height: 50px;
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2rem;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .stat-card {
+      background: rgba(0, 174, 239, 0.05);
+      border: 1px solid rgba(0, 174, 239, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .stat-card h2 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      margin-bottom: 1rem;
+    }
+    
+    .big-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 5rem;
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px rgba(0, 174, 239, 0.5);
+    }
+    
+    .chart-container {
+      height: 250px;
+    }
+    
+    .last-updated {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    .refreshing { opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="/cloud9-logo.svg" alt="Cloud9">
+    <h1>📊 Live Event Dashboard</h1>
+  </div>
+  
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h2>Total Posters Generated</h2>
+      <div class="big-number" id="total">-</div>
+    </div>
+    
+    <div class="stat-card">
+      <h2>By Role</h2>
+      <div class="chart-container">
+        <canvas id="roleChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <h2>By Style</h2>
+      <div class="chart-container">
+        <canvas id="styleChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <h2>Fan Favorite Player</h2>
+      <div class="chart-container">
+        <canvas id="playerChart"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <div class="last-updated" id="lastUpdated">Loading...</div>
+
+  <script>
+    const API_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3001' 
+      : 'https://cloud9-roster-moment.onrender.com';
+    
+    let roleChart, styleChart, playerChart;
+    
+    const chartColors = [
+      '#00aeef', '#00d4ff', '#3d8bfd', '#6610f2', '#e83e8c'
+    ];
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          position: 'bottom',
+          labels: { color: '#e6f1ff', font: { family: 'Rajdhani' } }
+        }
+      }
+    };
+    
+    function createBarChart(ctx, labels, data) {
+      return new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: chartColors,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { color: '#e6f1ff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+            x: { ticks: { color: '#e6f1ff' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+    
+    function createDoughnutChart(ctx, labels, data) {
+      return new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: chartColors,
+            borderWidth: 0
+          }]
+        },
+        options: chartOptions
+      });
+    }
+    
+    async function fetchStats() {
+      document.body.classList.add('refreshing');
+      try {
+        const res = await fetch(`${API_URL}/stats`);
+        const data = await res.json();
+        
+        document.getElementById('total').textContent = data.total || 0;
+        
+        if (data.byRole?.length) {
+          if (roleChart) roleChart.destroy();
+          roleChart = createBarChart(
+            document.getElementById('roleChart'),
+            data.byRole.map(r => r.role || 'Unknown'),
+            data.byRole.map(r => r.count)
+          );
+        }
+        
+        if (data.byStyle?.length) {
+          if (styleChart) styleChart.destroy();
+          styleChart = createDoughnutChart(
+            document.getElementById('styleChart'),
+            data.byStyle.map(s => s.style || 'Unknown'),
+            data.byStyle.map(s => s.count)
+          );
+        }
+        
+        if (data.byPlayer?.length) {
+          if (playerChart) playerChart.destroy();
+          playerChart = createBarChart(
+            document.getElementById('playerChart'),
+            data.byPlayer.map(p => p.player || 'Unknown'),
+            data.byPlayer.map(p => p.count)
+          );
+        }
+        
+        document.getElementById('lastUpdated').textContent = 
+          `Last updated: ${new Date(data.lastUpdated).toLocaleTimeString()}`;
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+      document.body.classList.remove('refreshing');
+    }
+    
+    // Initial load and auto-refresh every 10 seconds
+    fetchStats();
+    setInterval(fetchStats, 10000);
+  </script>
+</body>
+</html>
