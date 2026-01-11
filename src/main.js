@@ -38,15 +38,15 @@ const screens = {
     <div class="screen">
       <h2>Elige un Estilo y Email</h2>
       <div class="grid">
-        <button class="style-btn ${state.style === 'Painted Hype' ? 'selected' : ''}" 
+        <button class="style-btn" 
                 id="style-Painted-Hype" 
-                onclick="window.handleStyleSelection('Painted Hype')">🎨 Painted Hype</button>
-        <button class="style-btn ${state.style === 'Hype Match Day' ? 'selected' : ''}" 
+                onclick="window.handleStyleSelection('Painted Hype', this)">🎨 Painted Hype</button>
+        <button class="style-btn" 
                 id="style-Hype-Match-Day" 
-                onclick="window.handleStyleSelection('Hype Match Day')">⚡ Hype Match Day</button>
-        <button class="style-btn ${state.style === 'Social Media Avatar' ? 'selected' : ''}" 
+                onclick="window.handleStyleSelection('Hype Match Day', this)">⚡ Hype Match Day</button>
+        <button class="style-btn" 
                 id="style-Social-Media-Avatar" 
-                onclick="window.handleStyleSelection('Social Media Avatar')">👤 Social Media Avatar</button>
+                onclick="window.handleStyleSelection('Social Media Avatar', this)">👤 Social Media Avatar</button>
       </div>
       
       <div style="margin-top: 1.5rem; text-align: left;">
@@ -153,9 +153,16 @@ window.setStyle = (style) => {
   nextScreen();
 };
 
-window.handleStyleSelection = (style) => {
+window.handleStyleSelection = (style, element) => {
   state.style = style;
-  render(); // Re-renderizar para aplicar la clase 'selected'
+  
+  // Actualización parcial del DOM para evitar el "flash" de render()
+  const btns = document.querySelectorAll('.style-btn');
+  btns.forEach(btn => btn.classList.remove('selected'));
+  
+  if (element) {
+    element.classList.add('selected');
+  }
 };
 
 window.handleEmail = (event) => {
