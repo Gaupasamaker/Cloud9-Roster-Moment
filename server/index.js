@@ -47,40 +47,51 @@ const transporter = nodemailer.createTransport({
   greetingTimeout: 15000,
 });
 
-// Función para enviar email con el póster
+// Función para enviar email con el póster usando la API de Brevo (más estable en Render)
 async function sendPosterEmail(toEmail, imageDataBase64) {
-  console.log(`📧 DEBUG: Iniciando proceso de envío a ${toEmail}`);
-  console.log(`📧 DEBUG: Usando SMTP Host: ${process.env.SMTP_HOST || 'smtp-relay.brevo.com'}`);
-  console.log(`📧 DEBUG: Usando Remitente: ${process.env.EMAIL_FROM}`);
+  console.log(`📧 DEBUG: Iniciando proceso de envío vía API a ${toEmail}`);
   
+  const apiKey = process.env.SMTP_PASS; // Usamos la misma API Key que ya tienes
+  const senderEmail = process.env.EMAIL_FROM;
+
+  if (!apiKey || !senderEmail) {
+    console.error('❌ ERROR: API Key o EMAIL_FROM no configurados');
+    return false;
+  }
+
   try {
-    const senderEmail = process.env.EMAIL_FROM;
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: "Roster Moment", email: senderEmail },
+        to: [{ email: toEmail }],
+        subject: "¡Tu Roster Moment ya está aquí! 🏆",
+        textContent: "¡Hola! Aquí tienes tu póster épico de Cloud9. ¡Esperamos que te guste!",
+        attachment: [
+          {
+            name: "roster-moment.png",
+            content: imageDataBase64
+          }
+        ]
+      })
+    });
+
+    const result = await response.json();
     
-    if (!senderEmail) {
-      console.error('❌ ERROR: EMAIL_FROM no está configurado en el .env');
+    if (response.ok) {
+      console.log('✅ DEBUG: Email enviado con éxito vía API:', result.messageId || 'Success');
+      return true;
+    } else {
+      console.error('❌ DEBUG: Error en la API de Brevo:', JSON.stringify(result));
       return false;
     }
-
-    const mailOptions = {
-      from: `"Roster Moment" <${senderEmail}>`,
-      to: toEmail,
-      subject: '¡Tu Roster Moment ya está aquí! 🏆',
-      text: '¡Hola! Aquí tienes tu póster épico de Cloud9. ¡Esperamos que te guste!',
-      attachments: [
-        {
-          filename: 'roster-moment.png',
-          content: imageDataBase64,
-          encoding: 'base64'
-        }
-      ]
-    };
-
-    console.log('📧 DEBUG: Llamando a transporter.sendMail...');
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ DEBUG: Respuesta de Nodemailer recibida con éxito:', info.messageId);
-    return true;
   } catch (error) {
-    console.error('❌ DEBUG: ERROR CRÍTICO AL ENVIAR EMAIL:', error.message);
+    console.error('❌ DEBUG: ERROR CRÍTICO AL ENVIAR EMAIL VÍA API:', error.message);
     return false;
   }
 }
