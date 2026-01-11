@@ -34,16 +34,19 @@ const screens = {
     </div>
   `,
   style: () => {
-    // Pequeño hack para asegurar que el estilo seleccionado se resalte al cargar la pantalla
-    setTimeout(updateStyleSelection, 100);
-
     return `
     <div class="screen">
       <h2>Elige un Estilo y Email</h2>
       <div class="grid">
-        <button class="style-btn" id="style-Painted-Hype" onclick="state.style = 'Painted Hype'; updateStyleSelection()">🎨 Painted Hype</button>
-        <button class="style-btn" id="style-Hype-Match-Day" onclick="state.style = 'Hype Match Day'; updateStyleSelection()">⚡ Hype Match Day</button>
-        <button class="style-btn" id="style-Social-Media-Avatar" onclick="state.style = 'Social Media Avatar'; updateStyleSelection()">👤 Social Media Avatar</button>
+        <button class="style-btn ${state.style === 'Painted Hype' ? 'selected' : ''}" 
+                id="style-Painted-Hype" 
+                onclick="window.handleStyleSelection('Painted Hype')">🎨 Painted Hype</button>
+        <button class="style-btn ${state.style === 'Hype Match Day' ? 'selected' : ''}" 
+                id="style-Hype-Match-Day" 
+                onclick="window.handleStyleSelection('Hype Match Day')">⚡ Hype Match Day</button>
+        <button class="style-btn ${state.style === 'Social Media Avatar' ? 'selected' : ''}" 
+                id="style-Social-Media-Avatar" 
+                onclick="window.handleStyleSelection('Social Media Avatar')">👤 Social Media Avatar</button>
       </div>
       
       <div style="margin-top: 1.5rem; text-align: left;">
@@ -150,19 +153,9 @@ window.setStyle = (style) => {
   nextScreen();
 };
 
-window.updateStyleSelection = () => {
-  const btns = document.querySelectorAll('.style-btn');
-  btns.forEach(btn => {
-    btn.style.background = 'rgba(100, 255, 218, 0.1)';
-    btn.style.border = '1px solid var(--accent-blue)';
-  });
-  
-  const selectedId = `style-${state.style.replace(/\s+/g, '-')}`;
-  const selectedBtn = document.getElementById(selectedId);
-  if (selectedBtn) {
-    selectedBtn.style.background = 'var(--accent-blue)';
-    selectedBtn.style.color = '#0a192f';
-  }
+window.handleStyleSelection = (style) => {
+  state.style = style;
+  render(); // Re-renderizar para aplicar la clase 'selected'
 };
 
 window.handleEmail = (event) => {
@@ -229,12 +222,6 @@ window.nextScreen = async () => {
     }
   } else if (currentIndex < screenKeys.length - 1) {
     state.currentScreen = screenKeys[currentIndex + 1];
-    
-    // Si pasamos a la pantalla de estilo, resaltar el estilo por defecto
-    if (state.currentScreen === 'style') {
-      setTimeout(updateStyleSelection, 50);
-    }
-    
     render();
   }
 };

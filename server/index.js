@@ -311,6 +311,14 @@ app.post('/generate', async (req, res) => {
         }
       }
     }
+
+    // SEGURIDAD: Si llegamos aquí sin haber enviado respuesta (ej. no hubo inlineData)
+    console.warn('⚠️ No se encontró inlineData en la respuesta de Google AI');
+    res.status(500).json({
+      success: false,
+      message: 'La IA no generó una imagen válida. Intenta con otro estilo.',
+      error: 'Missing inlineData'
+    });
     
   } catch (error) {
     console.error('=== ERROR ===');
