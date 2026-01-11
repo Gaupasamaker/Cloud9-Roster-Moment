@@ -14,30 +14,36 @@ let state = {
 const screens = {
   role: () => `
     <div class="screen">
-      <h1>🎮 Roster Moment</h1>
+      <h1 style="margin-top: 2rem">🎮 Roster Moment</h1>
+      <p style="margin-bottom: 1rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Join the Team</p>
       <h2>Select your Role</h2>
       <div class="grid">
-        <button onclick="setRole('Top')">🛡️ Top</button>
-        <button onclick="setRole('Jungle')">🌿 Jungle</button>
-        <button onclick="setRole('Mid')">🔮 Mid</button>
-        <button onclick="setRole('ADC')">🏹 ADC</button>
+        <button onclick="setRole('Top')">🛡️ Top Lane</button>
+        <button onclick="setRole('Jungle')">🌿 Jungler</button>
+        <button onclick="setRole('Mid')">🔮 Mid Lane</button>
+        <button onclick="setRole('ADC')">🏹 Attack Damage</button>
         <button onclick="setRole('Support')">✨ Support</button>
       </div>
     </div>
   `,
   photo: () => `
     <div class="screen">
-      <h2>Upload your Photo</h2>
-      <input type="file" accept="image/*" capture="user" id="photoInput" onchange="handlePhoto(event)">
+      <h2 style="margin-top: 2rem">Upload your Photo</h2>
+      <p style="color: var(--text-dim); margin-bottom: 1rem;">Show us your game face</p>
+      <div style="position: relative;">
+        <input type="file" accept="image/*" capture="user" id="photoInput" onchange="handlePhoto(event)" style="opacity: 0; position: absolute; z-index: -1;">
+        <button onclick="document.getElementById('photoInput').click()" id="uploadBtn" style="background: rgba(255,255,255,0.05);">📸 Take / Select Photo</button>
+      </div>
       <div id="previewContainer"></div>
-      <button onclick="nextScreen()" id="nextBtn" disabled>Next</button>
-      <button class="secondary-btn" onclick="prevScreen()">Back</button>
+      <button onclick="nextScreen()" id="nextBtn" disabled style="background: var(--accent-blue); color: #0a192f;">Continue ➔</button>
+      <button class="secondary-btn" onclick="prevScreen()">Back to Roles</button>
     </div>
   `,
   style: () => {
     return `
     <div class="screen">
-      <h2>Choose a Style and Email</h2>
+      <h2 style="margin-top: 2rem">Finalize Your Poster</h2>
+      <p style="color: var(--text-dim); margin-bottom: 1rem;">Choose your artistic style</p>
       <div class="grid">
         <button class="style-btn" 
                 id="style-Painted-Hype" 
@@ -47,26 +53,26 @@ const screens = {
                 onclick="window.handleStyleSelection('Hype Match Day', this)">⚡ Hype Match Day</button>
         <button class="style-btn" 
                 id="style-Social-Media-Avatar" 
-                onclick="window.handleStyleSelection('Social Media Avatar', this)">👤 Social Media Avatar</button>
+                onclick="window.handleStyleSelection('Social Media Avatar', this)">👤 Pro Avatar</button>
       </div>
       
-      <div style="margin-top: 1.5rem; text-align: left;">
-        <label for="emailInput" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Your Email (to send you the poster):</label>
-        <input type="email" id="emailInput" placeholder="example@email.com" value="${state.email}" oninput="handleEmail(event)">
+      <div style="margin-top: 2rem; text-align: left; background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+        <label for="emailInput" style="display: block; margin-bottom: 0.8rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--accent-blue); letter-spacing: 1px;">Where should we send your poster?</label>
+        <input type="email" id="emailInput" placeholder="Enter your email address" value="${state.email}" oninput="handleEmail(event)">
       </div>
       
-      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f;">View Result 🏆</button>
-      <button class="secondary-btn" onclick="prevScreen()">Back</button>
+      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f; font-size: 1.2rem;">Generate Result 🏆</button>
+      <button class="secondary-btn" onclick="prevScreen()">Change Photo</button>
     </div>
   `;
   },
   generating: () => `
     <div class="screen generating-screen">
       <div class="loader"></div>
-      <h2>Generating your Roster Moment...</h2>
-      <p class="generating-text">Creating your epic poster</p>
-      <div id="status-log" style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5; color: #64ffda;">
-        Connecting to the server...
+      <div class="generating-text">Initializing AI</div>
+      <p style="color: var(--text-dim); margin-top: 0.5rem; font-size: 0.9rem;">Processing visual blueprints...</p>
+      <div id="status-log" style="font-size: 0.7rem; margin-top: 3rem; opacity: 0.4; font-family: monospace;">
+        Establishing secure uplink...
       </div>
     </div>
   `,
