@@ -36,13 +36,16 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 // Configurar transportador de Email
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: false, // Brevo usa STARTTLS en el puerto 587
+  host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+  port: 465, // CAMBIO A PUERTO 465 (SSL DIRECTO)
+  secure: true, // TRUE para puerto 465
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  connectionTimeout: 10000, // 10 segundos máximo para conectar
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 // Función para enviar email con el póster
