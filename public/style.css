@@ -316,14 +316,30 @@
 }
 
 .role-icon {
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: 0.5rem;
-  filter: drop-shadow(0 0 10px rgba(0, 174, 239, 0.5));
+  transition: transform 0.3s ease;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(0, 174, 239, 0.4));
+}
+
+.role-card:hover .role-icon {
+  transform: scale(1.1);
 }
 
 .role-name {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;

@@ -17,11 +17,11 @@ let state = {
 // Datos de jugadores Cloud9
 const API_BASE = 'https://cloud9-roster-moment.onrender.com';
 const PLAYERS = [
-  { id: 'player1', name: 'Thanatos', role: 'Top', image: `${API_BASE}/api/players/player1.webp` },
-  { id: 'player2', name: 'Blaber', role: 'Jungle', image: `${API_BASE}/api/players/player2.webp` },
-  { id: 'player3', name: 'Zven', role: 'Mid', image: `${API_BASE}/api/players/player3.webp` },
-  { id: 'player4', name: 'APA', role: 'ADC', image: `${API_BASE}/api/players/player4.webp` },
-  { id: 'player5', name: 'Vulcan', role: 'Support', image: `${API_BASE}/api/players/player5.webp` }
+  { id: 'player1', name: 'Thanatos', role: 'Top', image: `${API_BASE}/api/players/player1.png` },
+  { id: 'player2', name: 'Blaber', role: 'Jungle', image: `${API_BASE}/api/players/player2.png` },
+  { id: 'player3', name: 'Zven', role: 'Mid', image: `${API_BASE}/api/players/player3.png` },
+  { id: 'player4', name: 'APA', role: 'ADC', image: `${API_BASE}/api/players/player4.png` },
+  { id: 'player5', name: 'Vulcan', role: 'Support', image: `${API_BASE}/api/players/player5.png` }
 ];
 
 // Header con logo Cloud9 que aparece en todas las pantallas
@@ -40,32 +40,32 @@ const screens = {
       <h2>Select your Role</h2>
       <div class="role-grid">
         <button class="role-card" onclick="setRole('Top')">
-          <div class="role-icon">⚔️</div>
+          <div class="role-icon"><img src="/roles/top.png" alt="Top"></div>
           <div class="role-name">Top Lane</div>
           <div class="role-desc">The Frontline</div>
         </button>
         <button class="role-card" onclick="setRole('Jungle')">
-          <div class="role-icon">🌲</div>
+          <div class="role-icon"><img src="/roles/jungle.png" alt="Jungle"></div>
           <div class="role-name">Jungler</div>
           <div class="role-desc">Map Controller</div>
         </button>
         <button class="role-card" onclick="setRole('Mid')">
-          <div class="role-icon">✨</div>
+          <div class="role-icon"><img src="/roles/mid.png" alt="Mid"></div>
           <div class="role-name">Mid Lane</div>
           <div class="role-desc">The Playmaker</div>
         </button>
         <button class="role-card" onclick="setRole('ADC')">
-          <div class="role-icon">🎯</div>
+          <div class="role-icon"><img src="/roles/adc.png" alt="ADC"></div>
           <div class="role-name">ADC</div>
           <div class="role-desc">Damage Dealer</div>
         </button>
         <button class="role-card" onclick="setRole('Bot')">
-          <div class="role-icon">🏹</div>
+          <div class="role-icon"><img src="/roles/bot.png" alt="Bot"></div>
           <div class="role-name">Bot Lane</div>
           <div class="role-desc">Carry Master</div>
         </button>
         <button class="role-card" onclick="setRole('Support')">
-          <div class="role-icon">🛡️</div>
+          <div class="role-icon"><img src="/roles/support.png" alt="Support"></div>
           <div class="role-name">Support</div>
           <div class="role-desc">Team Guardian</div>
         </button>
