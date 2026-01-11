@@ -3,6 +3,7 @@ const app = document.getElementById('app');
 let state = {
   currentScreen: 'role',
   role: '',
+  favoritePlayer: '',
   photo: null,
   photoBase64: null,
   style: 'Painted Hype',
@@ -11,6 +12,15 @@ let state = {
   generatedImage: null,
   generatedImageName: null
 };
+
+// Datos de jugadores Cloud9 (placeholder - se actualizarán con nombres reales)
+const PLAYERS = [
+  { id: 'player1', name: 'Fudge', role: 'Top', image: '/api/players/player1.webp' },
+  { id: 'player2', name: 'Blaber', role: 'Jungle', image: '/api/players/player2.webp' },
+  { id: 'player3', name: 'Jojopyun', role: 'Mid', image: '/api/players/player3.webp' },
+  { id: 'player4', name: 'Berserker', role: 'ADC', image: '/api/players/player4.webp' },
+  { id: 'player5', name: 'Vulcan', role: 'Support', image: '/api/players/player5.webp' }
+];
 
 // Header con logo Cloud9 que aparece en todas las pantallas
 const headerComponent = () => `
@@ -26,13 +36,52 @@ const screens = {
       <h1 class="app-title">🎮 Roster Moment</h1>
       <p class="subtitle">Join the Team</p>
       <h2>Select your Role</h2>
-      <div class="grid">
-        <button onclick="setRole('Top')">🛡️ Top Lane</button>
-        <button onclick="setRole('Jungle')">🌿 Jungler</button>
-        <button onclick="setRole('Mid')">🔮 Mid Lane</button>
-        <button onclick="setRole('ADC')">🏹 Attack Damage</button>
-        <button onclick="setRole('Support')">✨ Support</button>
+      <div class="role-grid">
+        <button class="role-card" onclick="setRole('Top')">
+          <div class="role-icon">⚔️</div>
+          <div class="role-name">Top Lane</div>
+          <div class="role-desc">The Frontline</div>
+        </button>
+        <button class="role-card" onclick="setRole('Jungle')">
+          <div class="role-icon">🌲</div>
+          <div class="role-name">Jungler</div>
+          <div class="role-desc">Map Controller</div>
+        </button>
+        <button class="role-card" onclick="setRole('Mid')">
+          <div class="role-icon">✨</div>
+          <div class="role-name">Mid Lane</div>
+          <div class="role-desc">The Playmaker</div>
+        </button>
+        <button class="role-card" onclick="setRole('ADC')">
+          <div class="role-icon">🎯</div>
+          <div class="role-name">ADC</div>
+          <div class="role-desc">Damage Dealer</div>
+        </button>
+        <button class="role-card" onclick="setRole('Support')">
+          <div class="role-icon">🛡️</div>
+          <div class="role-name">Support</div>
+          <div class="role-desc">Team Guardian</div>
+        </button>
       </div>
+    </div>
+  `,
+  player: () => `
+    ${headerComponent()}
+    <div class="screen">
+      <h2>Pick your Favorite Player</h2>
+      <p class="subtitle-dim">Who inspires you the most?</p>
+      <div class="player-grid">
+        ${PLAYERS.map(player => `
+          <button class="player-card" onclick="setPlayer('${player.id}', '${player.name}')">
+            <div class="player-photo">
+              <img src="${player.image}" alt="${player.name}" onerror="this.style.display='none'">
+            </div>
+            <div class="player-name">${player.name}</div>
+            <div class="player-role">${player.role}</div>
+          </button>
+        `).join('')}
+      </div>
+      <button class="secondary-btn" onclick="prevScreen()">Back to Roles</button>
     </div>
   `,
   photo: () => `
@@ -86,11 +135,11 @@ const screens = {
     ${headerComponent()}
     <div class="screen generating-screen">
       <div class="loader-container">
-        <div class="loader"></div>
-        <div class="loader-glow"></div>
+        <img src="/cloud9-logo.svg" alt="Cloud9" class="loader-logo">
+        <div class="loader-ring"></div>
       </div>
-      <div class="generating-text">Initializing AI</div>
-      <p class="subtitle-dim">Processing visual blueprints...</p>
+      <div class="generating-text" id="generating-text">Initializing AI</div>
+      <p class="subtitle-dim" id="generating-subtitle">Preparing your epic moment...</p>
       <div id="status-log" class="status-log">
         Establishing secure uplink...
       </div>
@@ -117,15 +166,18 @@ const screens = {
       ? state.generatedImage
       : `https://cloud9-roster-moment.onrender.com/generated/${state.generatedImageName || ''}`;
 
+    const twitterText = encodeURIComponent(`🎮 Just joined the @Cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment #LEC`);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(qrUrl)}`;
+
     return `
     ${headerComponent()}
     <div class="screen">
       <h1 class="result-title">🏆 YOUR ROSTER MOMENT</h1>
       <div class="result-card">
         ${state.generatedImage
-        ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado" onclick="window.zoomImage()">`
+        ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Generated poster" onclick="window.zoomImage()">`
         : state.photo
-          ? `<img src="${state.photo}" class="photo-preview-large" alt="Previsualización de foto">`
+          ? `<img src="${state.photo}" class="photo-preview-large" alt="Photo preview">`
           : '<div class="placeholder-img">No Photo</div>'}
         <h2 class="role-display">${roleEmojis[state.role] || ''} ${state.role.toUpperCase()}</h2>
         <p class="style-name">${state.style}</p>
@@ -134,11 +186,24 @@ const screens = {
       
       <!-- Modal para zoom -->
       <div id="imageModal" class="image-modal" onclick="window.closeZoom()">
-        <img src="${state.generatedImage || ''}" class="modal-content" id="modalImg" alt="Póster ampliado">
+        <img src="${state.generatedImage || ''}" class="modal-content" id="modalImg" alt="Full size poster">
         <button class="close-modal" onclick="window.closeZoom()">Close</button>
       </div>
 
       ${state.generatedImage ? `
+        <!-- Acciones principales -->
+        <div class="action-buttons">
+          <button onclick="window.downloadImage()" class="action-btn download-btn">
+            📥 Download
+          </button>
+          <a href="${twitterUrl}" target="_blank" class="action-btn twitter-btn">
+            𝕏 Share on X
+          </a>
+          <button onclick="window.shareInstagram()" class="action-btn instagram-btn">
+            📸 Instagram
+          </button>
+        </div>
+        
         <div class="qr-section">
           <p class="qr-label">📱 Scan to get your image</p>
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrUrl)}" alt="QR Code" class="qr-image">
@@ -165,6 +230,11 @@ function render() {
 
 window.setRole = (role) => {
   state.role = role;
+  nextScreen();
+};
+
+window.setPlayer = (playerId, playerName) => {
+  state.favoritePlayer = playerName;
   nextScreen();
 };
 
@@ -227,8 +297,63 @@ window.closeZoom = () => {
   if (modal) modal.classList.remove('active');
 };
 
+// Descargar imagen directamente
+window.downloadImage = () => {
+  if (!state.generatedImage) return;
+
+  const link = document.createElement('a');
+  link.href = state.generatedImage;
+  link.download = `roster-moment-${state.role.toLowerCase()}-${Date.now()}.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// Compartir en Instagram (copiar texto y mostrar instrucciones)
+window.shareInstagram = () => {
+  const instagramText = `🎮 Just joined the @cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment #LEC #Gaming`;
+
+  navigator.clipboard.writeText(instagramText).then(() => {
+    alert('✅ Caption copied to clipboard!\n\n1. Download your image using the Download button\n2. Open Instagram and create a new post\n3. Select your poster image\n4. Paste the caption (Ctrl+V / Cmd+V)');
+  }).catch(() => {
+    alert(`📋 Copy this caption for Instagram:\n\n${instagramText}`);
+  });
+};
+
 // Configuración de la API - URL de Render para producción
 const API_URL = 'https://cloud9-roster-moment.onrender.com';
+
+// Mensajes dinámicos para la pantalla de carga
+const LOADING_MESSAGES = [
+  { text: 'Initializing AI', subtitle: 'Preparing your epic moment...' },
+  { text: 'Mixing pixels', subtitle: 'Creating visual magic...' },
+  { text: 'Adding Cloud9 energy', subtitle: 'Channeling team spirit...' },
+  { text: 'Rendering your moment', subtitle: 'Almost there...' },
+  { text: 'Final touches', subtitle: 'Perfecting your poster...' }
+];
+
+let loadingMessageInterval = null;
+
+function startLoadingMessages() {
+  let index = 0;
+  const textEl = document.getElementById('generating-text');
+  const subtitleEl = document.getElementById('generating-subtitle');
+
+  if (textEl && subtitleEl) {
+    loadingMessageInterval = setInterval(() => {
+      index = (index + 1) % LOADING_MESSAGES.length;
+      textEl.textContent = LOADING_MESSAGES[index].text;
+      subtitleEl.textContent = LOADING_MESSAGES[index].subtitle;
+    }, 2500);
+  }
+}
+
+function stopLoadingMessages() {
+  if (loadingMessageInterval) {
+    clearInterval(loadingMessageInterval);
+    loadingMessageInterval = null;
+  }
+}
 
 window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
@@ -238,6 +363,7 @@ window.nextScreen = async () => {
   if (state.currentScreen === 'style') {
     state.currentScreen = 'generating';
     render();
+    startLoadingMessages();
 
     const statusLog = document.getElementById('status-log');
 
@@ -251,6 +377,7 @@ window.nextScreen = async () => {
         },
         body: JSON.stringify({
           role: state.role,
+          favoritePlayer: state.favoritePlayer,
           style: state.style,
           email: state.email,
           consent: state.consent,
@@ -284,6 +411,7 @@ window.nextScreen = async () => {
       if (statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
       alert(`Error de conexión: ${error.message}`);
     } finally {
+      stopLoadingMessages();
       // Pequeña espera para que se vea el mensaje de éxito antes de cambiar
       setTimeout(() => {
         state.currentScreen = 'result';
@@ -309,6 +437,7 @@ window.resetApp = () => {
   state = {
     currentScreen: 'role',
     role: '',
+    favoritePlayer: '',
     photo: null,
     photoBase64: null,
     style: 'Painted Hype',

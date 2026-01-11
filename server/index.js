@@ -54,15 +54,16 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     ip_address TEXT,
     role TEXT,
-    style TEXT
+    style TEXT,
+    favorite_player TEXT
   )
 `);
 
 console.log('📊 Base de datos SQLite inicializada');
 
 // Función para guardar email con consentimiento
-function saveEmailWithConsent(email, consent, ipAddress, role, style) {
-  const CONSENT_TEXT = 'Acepto recibir mi poster por email y comunicaciones de Cloud9';
+function saveEmailWithConsent(email, consent, ipAddress, role, style, favoritePlayer) {
+  const CONSENT_TEXT = 'I agree to receive my poster via email and communications from Cloud9';
 
   if (!consent) {
     console.log('⚠️ Usuario no dio consentimiento, email no guardado');
@@ -71,10 +72,10 @@ function saveEmailWithConsent(email, consent, ipAddress, role, style) {
 
   try {
     const stmt = db.prepare(`
-      INSERT OR IGNORE INTO subscribers (email, consent, consent_text, ip_address, role, style)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO subscribers (email, consent, consent_text, ip_address, role, style, favorite_player)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    const result = stmt.run(email, 1, CONSENT_TEXT, ipAddress, role, style);
+    const result = stmt.run(email, 1, CONSENT_TEXT, ipAddress, role, style, favoritePlayer || null);
 
     if (result.changes > 0) {
       console.log(`✅ Email guardado en BD: ${email}`);
@@ -162,6 +163,10 @@ if (!fs.existsSync(generatedDir)) {
 }
 app.use('/generated', express.static(generatedDir));
 
+// Servir imágenes de jugadores
+const playersDir = path.join(__dirname, 'assets', 'players');
+app.use('/api/players', express.static(playersDir));
+
 // Función para generar el prompt según rol y estilo
 function generatePrompt(role, style, hasPhoto = false, playersCount = 0) {
 
@@ -243,7 +248,7 @@ ${negativePrompt}`;
 
 // Endpoint principal
 app.post('/generate', async (req, res) => {
-  const { role, style, email, photo, consent } = req.body;
+  const { role, style, email, photo, consent, favoritePlayer } = req.body;
 
   // Obtener IP del cliente para cumplimiento GDPR
   const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
@@ -252,12 +257,13 @@ app.post('/generate', async (req, res) => {
   console.log('Role:', role);
   console.log('Style:', style);
   console.log('Email:', email);
+  console.log('Favorite Player:', favoritePlayer);
   console.log('Consent:', consent ? 'Yes' : 'No');
   console.log('Photo received:', photo ? 'Yes' : 'No');
 
   // Guardar email en BD si hay consentimiento
   if (email && consent) {
-    saveEmailWithConsent(email, consent, clientIP, role, style);
+    saveEmailWithConsent(email, consent, clientIP, role, style, favoritePlayer);
   }
 
   try {
@@ -440,6 +446,55 @@ app.get('/emails', (req, res) => {
     res.json({
       count: subscribers.length,
       subscribers
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint para estadísticas del dashboard (público, sin token)
+app.get('/stats', (req, res) => {
+  try {
+    const total = db.prepare('SELECT COUNT(*) as count FROM subscribers').get().count;
+
+    const byRole = db.prepare(`
+      SELECT role, COUNT(*) as count 
+      FROM subscribers 
+      WHERE role IS NOT NULL 
+      GROUP BY role 
+      ORDER BY count DESC
+    `).all();
+
+    const byStyle = db.prepare(`
+      SELECT style, COUNT(*) as count 
+      FROM subscribers 
+      WHERE style IS NOT NULL 
+      GROUP BY style 
+      ORDER BY count DESC
+    `).all();
+
+    const byPlayer = db.prepare(`
+      SELECT favorite_player as player, COUNT(*) as count 
+      FROM subscribers 
+      WHERE favorite_player IS NOT NULL 
+      GROUP BY favorite_player 
+      ORDER BY count DESC
+    `).all();
+
+    const byHour = db.prepare(`
+      SELECT strftime('%H', created_at) as hour, COUNT(*) as count 
+      FROM subscribers 
+      GROUP BY hour 
+      ORDER BY hour
+    `).all();
+
+    res.json({
+      total,
+      byRole,
+      byStyle,
+      byPlayer,
+      byHour,
+      lastUpdated: new Date().toISOString()
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

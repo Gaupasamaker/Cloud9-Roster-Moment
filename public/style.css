@@ -187,12 +187,58 @@
   color: var(--text-white);
 }
 
-/* ==================== LOADER MEJORADO ==================== */
+/* ==================== LOADER MEJORADO CON LOGO ==================== */
 .loader-container {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   margin: 2rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-logo {
+  width: 60px;
+  height: auto;
+  z-index: 2;
+  animation: logo-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--accent-blue));
+}
+
+@keyframes logo-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px var(--accent-blue));
+  }
+
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 40px var(--accent-blue)) drop-shadow(0 0 60px var(--accent-glow));
+  }
+}
+
+.loader-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: var(--accent-blue);
+  border-right-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: ring-spin 1.5s linear infinite;
+}
+
+@keyframes ring-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loader-glow {
@@ -200,11 +246,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
   background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
   animation: glow-pulse 2s ease-in-out infinite;
   border-radius: 50%;
+  z-index: 0;
 }
 
 @keyframes glow-pulse {
@@ -228,6 +275,128 @@
   font-family: 'Courier New', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* ==================== ROLE CARDS ==================== */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.role-grid .role-card:last-child {
+  grid-column: span 2;
+  max-width: 50%;
+  justify-self: center;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  background: rgba(0, 174, 239, 0.05);
+  border: 1px solid rgba(0, 174, 239, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: auto;
+}
+
+.role-card:hover {
+  transform: translateY(-5px);
+  background: rgba(0, 174, 239, 0.15);
+  border-color: var(--accent-blue);
+  box-shadow: 0 10px 30px rgba(0, 174, 239, 0.3);
+}
+
+.role-card:active {
+  transform: scale(0.95);
+}
+
+.role-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 10px rgba(0, 174, 239, 0.5));
+}
+
+.role-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-white);
+}
+
+.role-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+}
+
+/* ==================== PLAYER CARDS ==================== */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .player-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  background: rgba(0, 174, 239, 0.05);
+  border: 1px solid rgba(0, 174, 239, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.player-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: rgba(0, 174, 239, 0.15);
+  border-color: var(--accent-blue);
+  box-shadow: 0 10px 30px rgba(0, 174, 239, 0.3);
+}
+
+.player-photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--accent-blue);
+  margin-bottom: 0.8rem;
+  background: rgba(0, 174, 239, 0.1);
+}
+
+.player-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-white);
+}
+
+.player-role {
+  font-size: 0.7rem;
+  color: var(--accent-blue);
+  margin-top: 0.2rem;
 }
 
 * {
@@ -486,6 +655,63 @@ input[type="email"]:focus {
 
 .image-modal.active {
   display: flex;
+}
+
+/* ==================== ACTION BUTTONS (SHARE/DOWNLOAD) ==================== */
+.action-buttons {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+}
+
+.download-btn {
+  background: var(--gradient-primary);
+  color: var(--primary-bg);
+}
+
+.download-btn:hover {
+  box-shadow: 0 0 25px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.twitter-btn {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #333;
+}
+
+.twitter-btn:hover {
+  background: #1a1a1a;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.instagram-btn {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  color: #ffffff;
+}
+
+.instagram-btn:hover {
+  box-shadow: 0 0 20px rgba(225, 48, 108, 0.5);
+  transform: translateY(-2px);
 }
 
 .modal-content {
