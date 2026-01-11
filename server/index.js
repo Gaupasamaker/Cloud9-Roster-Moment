@@ -288,17 +288,15 @@ app.post('/generate', async (req, res) => {
           const buffer = Buffer.from(imageData, 'base64');
           console.log('Tamaño del buffer creado:', buffer.length, 'bytes');
           
-          fs.writeFileSync(filePath, buffer);
-          
-          // FORZAR URL PÚBLICA DE RENDER
           imageUrl = `https://cloud9-roster-moment.onrender.com/generated/${fileName}`;
           console.log('Imagen guardada y accesible en URL pública:', imageUrl);
 
-          // Enviar email automáticamente
+          // Enviar email automáticamente (SIN AWAIT para no bloquear la respuesta)
           if (email) {
-            console.log('Iniciando envío de email a:', email);
-            // IMPORTANTE: Esperar al envío del email para asegurar que no se corta el proceso
-            await sendPosterEmail(email, filePath);
+            console.log('Iniciando envío de email en segundo plano a:', email);
+            sendPosterEmail(email, filePath).then(success => {
+              console.log(success ? '✅ Email de fondo enviado' : '❌ Email de fondo falló');
+            });
           }
           break;
         }
