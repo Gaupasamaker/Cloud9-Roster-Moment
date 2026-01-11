@@ -302,6 +302,7 @@ app.post('/generate', async (req, res) => {
             success: true,
             message: 'Roster Moment generado',
             imageUrl,
+            imageName: fileName, // Enviamos el nombre del archivo para el QR
             imageBase64: imageData,
             role,
             style,

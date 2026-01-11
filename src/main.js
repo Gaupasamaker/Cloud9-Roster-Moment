@@ -86,12 +86,16 @@ const screens = {
       Support: "✨"
     };
 
+    const qrUrl = state.generatedImage && !state.generatedImage.startsWith('data:') 
+      ? state.generatedImage 
+      : `https://cloud9-roster-moment.onrender.com/generated/${state.generatedImageName || ''}`;
+
     return `
     <div class="screen">
       <h1>🏆 YOUR ROSTER MOMENT</h1>
       <div class="result-card">
         ${state.generatedImage 
-          ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado">`
+          ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado" onclick="window.zoomImage()">`
           : state.photo 
             ? `<img src="${state.photo}" class="photo-preview-large" alt="Previsualización de foto">` 
             : '<div class="placeholder-img">No Photo</div>'}
@@ -99,10 +103,17 @@ const screens = {
         <p class="style-name">${state.style}</p>
         <p class="personality-msg">"${personality[state.role] || ''}"</p>
       </div>
+      
+      <!-- Modal para zoom -->
+      <div id="imageModal" class="image-modal" onclick="window.closeZoom()">
+        <img src="${state.generatedImage || ''}" class="modal-content" id="modalImg">
+        <button class="close-modal" onclick="window.closeZoom()">Cerrar</button>
+      </div>
+
       ${state.generatedImage ? `
         <div class="qr-section">
           <p class="qr-label">📱 Escanea para obtener tu imagen</p>
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(state.generatedImage)}" alt="QR Code" class="qr-image">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrUrl)}" alt="QR Code" class="qr-image">
         </div>
       ` : ''}
       <div class="email-sent">📧 Registrado: ${state.email}</div>
@@ -169,6 +180,16 @@ window.handleEmail = (event) => {
   state.email = event.target.value;
 };
 
+window.zoomImage = () => {
+  const modal = document.getElementById('imageModal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeZoom = () => {
+  const modal = document.getElementById('imageModal');
+  if (modal) modal.classList.remove('active');
+};
+
 // Configuración de la API - URL de Render para producción
 const API_URL = 'https://cloud9-roster-moment.onrender.com';
 
@@ -216,6 +237,10 @@ window.nextScreen = async () => {
       if (data.imageBase64) {
         state.generatedImage = `data:image/jpeg;base64,${data.imageBase64}`;
       }
+
+      if (data.imageName) {
+        state.generatedImageName = data.imageName;
+      }
     } catch (error) {
       console.error('Error detallado:', error);
       if(statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
@@ -250,7 +275,8 @@ window.resetApp = () => {
     photoBase64: null,
     style: 'Painted Hype',
     email: '',
-    generatedImage: null
+    generatedImage: null,
+    generatedImageName: null
   };
   render();
 };
