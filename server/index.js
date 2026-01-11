@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
+import Database from 'better-sqlite3';
 
 // Obtener IP local de la red
 function getLocalIP() {
@@ -33,10 +34,65 @@ const PORT = 3001;
 // Inicializar Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
+// ==================== BASE DE DATOS SQLITE ====================
+// Crear directorio de datos si no existe
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+// Inicializar base de datos SQLite
+const db = new Database(path.join(dataDir, 'emails.db'));
+
+// Crear tabla de subscribers si no existe
+db.exec(`
+  CREATE TABLE IF NOT EXISTS subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    consent BOOLEAN NOT NULL DEFAULT 0,
+    consent_text TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ip_address TEXT,
+    role TEXT,
+    style TEXT
+  )
+`);
+
+console.log('📊 Base de datos SQLite inicializada');
+
+// Función para guardar email con consentimiento
+function saveEmailWithConsent(email, consent, ipAddress, role, style) {
+  const CONSENT_TEXT = 'Acepto recibir mi poster por email y comunicaciones de Cloud9';
+
+  if (!consent) {
+    console.log('⚠️ Usuario no dio consentimiento, email no guardado');
+    return { saved: false, reason: 'no_consent' };
+  }
+
+  try {
+    const stmt = db.prepare(`
+      INSERT OR IGNORE INTO subscribers (email, consent, consent_text, ip_address, role, style)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    const result = stmt.run(email, 1, CONSENT_TEXT, ipAddress, role, style);
+
+    if (result.changes > 0) {
+      console.log(`✅ Email guardado en BD: ${email}`);
+      return { saved: true };
+    } else {
+      console.log(`ℹ️ Email ya existía en BD: ${email}`);
+      return { saved: false, reason: 'already_exists' };
+    }
+  } catch (error) {
+    console.error('❌ Error guardando email:', error.message);
+    return { saved: false, reason: 'error', error: error.message };
+  }
+}
+
 // Función para enviar email con el póster usando la API de Brevo (más estable en Render)
 async function sendPosterEmail(toEmail, imageDataBase64) {
   console.log(`📧 DEBUG: Iniciando proceso de envío vía API a ${toEmail}`);
-  
+
   const apiKey = process.env.SMTP_PASS; // Usamos la misma API Key que ya tienes
   const senderEmail = process.env.EMAIL_FROM;
 
@@ -47,7 +103,7 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
 
   // Debug de la clave (enmascarada)
   console.log(`📧 DEBUG: API Key cargada. Longitud: ${apiKey.length}`);
-  
+
   if (apiKey.length < 30) {
     console.warn('⚠️ WARNING: La clave de API es muy corta. Probablemente estés usando el SMTP Password en lugar de la API Key v3.');
     console.log('👉 Ve a Brevo -> SMTP & API -> API Keys para obtener la clave correcta.');
@@ -82,7 +138,7 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
     });
 
     const result = await response.json();
-    
+
     if (response.ok) {
       console.log('✅ Email sent successfully via API:', result.messageId || 'Success');
       return true;
@@ -108,7 +164,7 @@ app.use('/generated', express.static(generatedDir));
 
 // Función para generar el prompt según rol y estilo
 function generatePrompt(role, style, hasPhoto = false, playersCount = 0) {
-  
+
   // Instrucciones de MANDATO CRÍTICO (Para que no olvide al usuario)
   const mandatoryMandate = `
 MANDATORY ROLE ASSIGNMENT:
@@ -187,16 +243,25 @@ ${negativePrompt}`;
 
 // Endpoint principal
 app.post('/generate', async (req, res) => {
-  const { role, style, email, photo } = req.body;
-  
+  const { role, style, email, photo, consent } = req.body;
+
+  // Obtener IP del cliente para cumplimiento GDPR
+  const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+
   console.log('=== New Request ===');
   console.log('Role:', role);
   console.log('Style:', style);
   console.log('Email:', email);
+  console.log('Consent:', consent ? 'Yes' : 'No');
   console.log('Photo received:', photo ? 'Yes' : 'No');
-  
+
+  // Guardar email en BD si hay consentimiento
+  if (email && consent) {
+    saveEmailWithConsent(email, consent, clientIP, role, style);
+  }
+
   try {
-    const model = genAI.getGenerativeModel({ 
+    const model = genAI.getGenerativeModel({
       model: 'gemini-3-pro-image-preview'
     });
 
@@ -206,7 +271,7 @@ app.post('/generate', async (req, res) => {
     let playersCount = 0;
 
     if (fs.existsSync(playersDir)) {
-      const playerFiles = fs.readdirSync(playersDir).filter(file => 
+      const playerFiles = fs.readdirSync(playersDir).filter(file =>
         ['.jpg', '.jpeg', '.png', '.webp'].includes(path.extname(file).toLowerCase())
       );
 
@@ -231,7 +296,7 @@ app.post('/generate', async (req, res) => {
         const fileData = fs.readFileSync(filePath);
         const extension = path.extname(file).substring(1);
         const mimeType = `image/${extension === 'jpg' ? 'jpeg' : extension}`;
-        
+
         contentParts.push({
           inlineData: {
             mimeType: mimeType,
@@ -251,13 +316,13 @@ app.post('/generate', async (req, res) => {
 
     const hasPhoto = photo && photo.startsWith('data:image');
     const prompt = generatePrompt(role, style, hasPhoto, playersCount);
-    
+
     // El texto del prompt debe ser la primera parte o estar presente
     contentParts.unshift({ text: prompt });
 
     console.log('Prompt sent');
     console.log('Total images sent:', contentParts.length - 1);
-    
+
     console.log('Sending request to Google AI...');
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: contentParts }],
@@ -265,36 +330,36 @@ app.post('/generate', async (req, res) => {
         responseModalities: ['image', 'text'],
       },
     });
-    
+
     console.log('Response received from Google AI');
     const response = result.response;
-    
+
     // Log detallado de la estructura de la respuesta
     console.log('Candidates structure:', JSON.stringify(response.candidates.map(c => ({
       index: c.index,
       parts: c.content.parts.map(p => Object.keys(p))
     })), null, 2));
-    
+
     let imageUrl = null;
-    
+
     // Buscar la imagen en la respuesta
     if (response.candidates && response.candidates[0] && response.candidates[0].content) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
           console.log('MIME Type received:', part.inlineData.mimeType);
           console.log('Base64 data length:', part.inlineData.data.length);
-          
+
           const imageData = part.inlineData.data;
           const mimeType = part.inlineData.mimeType;
           const extension = mimeType.split('/')[1] || 'png';
-          
+
           const fileName = `roster_${Date.now()}.${extension}`;
           const filePath = path.join(generatedDir, fileName);
-          
+
           // Verificamos el buffer antes de escribir
           const buffer = Buffer.from(imageData, 'base64');
           console.log('Created buffer size:', buffer.length, 'bytes');
-          
+
           imageUrl = `https://cloud9-roster-moment.onrender.com/generated/${fileName}`;
           console.log('Image saved and accessible at public URL:', imageUrl);
 
@@ -331,7 +396,7 @@ app.post('/generate', async (req, res) => {
       message: 'The AI did not generate a valid image. Try with another style.',
       error: 'Missing inlineData'
     });
-    
+
   } catch (error) {
     console.error('=== ERROR ===');
     console.error('Message:', error.message);
@@ -346,6 +411,39 @@ app.post('/generate', async (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Endpoint para exportar emails (protegido con token simple)
+app.get('/emails', (req, res) => {
+  const token = req.query.token || req.headers['x-api-token'];
+  const expectedToken = process.env.ADMIN_TOKEN || 'cloud9-admin-2026';
+
+  if (token !== expectedToken) {
+    return res.status(401).json({ error: 'Unauthorized. Provide valid token.' });
+  }
+
+  try {
+    const subscribers = db.prepare('SELECT * FROM subscribers ORDER BY created_at DESC').all();
+
+    // Si piden CSV
+    if (req.query.format === 'csv') {
+      const csv = [
+        'id,email,consent,created_at,ip_address,role,style',
+        ...subscribers.map(s => `${s.id},"${s.email}",${s.consent},"${s.created_at}","${s.ip_address}","${s.role}","${s.style}"`)
+      ].join('\n');
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=subscribers.csv');
+      return res.send(csv);
+    }
+
+    res.json({
+      count: subscribers.length,
+      subscribers
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {

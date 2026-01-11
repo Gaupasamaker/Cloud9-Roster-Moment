@@ -7,6 +7,7 @@ let state = {
   photoBase64: null,
   style: 'Painted Hype',
   email: '',
+  consent: false,
   generatedImage: null,
   generatedImageName: null
 };
@@ -69,9 +70,14 @@ const screens = {
       <div class="email-input-container">
         <label for="emailInput" class="email-label">Where should we send your poster?</label>
         <input type="email" id="emailInput" placeholder="Enter your email address" value="${state.email}" oninput="handleEmail(event)">
+        
+        <label class="consent-label">
+          <input type="checkbox" id="consentCheckbox" ${state.consent ? 'checked' : ''} onchange="handleConsent(event)">
+          <span class="consent-text">Acepto recibir mi poster por email y comunicaciones de Cloud9</span>
+        </label>
       </div>
       
-      <button onclick="nextScreen()" class="generate-btn">Generate Result 🏆</button>
+      <button onclick="nextScreen()" class="generate-btn" ${!state.consent ? 'disabled' : ''}>Generate Result 🏆</button>
       <button class="secondary-btn" onclick="prevScreen()">Change Photo</button>
     </div>
   `;
@@ -202,6 +208,15 @@ window.handleEmail = (event) => {
   state.email = event.target.value;
 };
 
+window.handleConsent = (event) => {
+  state.consent = event.target.checked;
+  // Actualizar el estado del botón sin re-renderizar toda la pantalla
+  const generateBtn = document.querySelector('.generate-btn');
+  if (generateBtn) {
+    generateBtn.disabled = !state.consent;
+  }
+};
+
 window.zoomImage = () => {
   const modal = document.getElementById('imageModal');
   if (modal) modal.classList.add('active');
@@ -238,6 +253,7 @@ window.nextScreen = async () => {
           role: state.role,
           style: state.style,
           email: state.email,
+          consent: state.consent,
           photo: state.photoBase64
         })
       });
@@ -297,6 +313,7 @@ window.resetApp = () => {
     photoBase64: null,
     style: 'Painted Hype',
     email: '',
+    consent: false,
     generatedImage: null,
     generatedImageName: null
   };
