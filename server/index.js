@@ -284,13 +284,15 @@ app.post('/generate', async (req, res) => {
           
           fs.writeFileSync(filePath, buffer);
           
-          imageUrl = `https://${req.get('host')}/generated/${fileName}`;
-          console.log('Imagen guardada y accesible en:', imageUrl);
+          // FORZAR URL PÚBLICA DE RENDER
+          imageUrl = `https://cloud9-roster-moment.onrender.com/generated/${fileName}`;
+          console.log('Imagen guardada y accesible en URL pública:', imageUrl);
 
           // Enviar email automáticamente
           if (email) {
             console.log('Iniciando envío de email a:', email);
-            sendPosterEmail(email, filePath);
+            // IMPORTANTE: Esperar al envío del email para asegurar que no se corta el proceso
+            await sendPosterEmail(email, filePath);
           }
           break;
         }
