@@ -9,6 +9,7 @@ let state = {
   style: 'Painted Hype',
   email: '',
   consent: false,
+  showInGallery: false,
   generatedImage: null,
   generatedImageName: null
 };
@@ -122,7 +123,12 @@ const screens = {
         
         <label class="consent-label">
           <input type="checkbox" id="consentCheckbox" ${state.consent ? 'checked' : ''} onchange="handleConsent(event)">
-          <span class="consent-text">Acepto recibir mi poster por email y comunicaciones de Cloud9</span>
+          <span class="consent-text">I agree to receive my poster via email and communications from Cloud9</span>
+        </label>
+        
+        <label class="consent-label">
+          <input type="checkbox" id="galleryCheckbox" ${state.showInGallery ? 'checked' : ''} onchange="handleGalleryConsent(event)">
+          <span class="consent-text">🖼️ Show my poster in the event gallery</span>
         </label>
       </div>
       
@@ -287,6 +293,10 @@ window.handleConsent = (event) => {
   }
 };
 
+window.handleGalleryConsent = (event) => {
+  state.showInGallery = event.target.checked;
+};
+
 window.zoomImage = () => {
   const modal = document.getElementById('imageModal');
   if (modal) modal.classList.add('active');
@@ -381,6 +391,7 @@ window.nextScreen = async () => {
           style: state.style,
           email: state.email,
           consent: state.consent,
+          showInGallery: state.showInGallery,
           photo: state.photoBase64
         })
       });
@@ -443,6 +454,7 @@ window.resetApp = () => {
     style: 'Painted Hype',
     email: '',
     consent: false,
+    showInGallery: false,
     generatedImage: null,
     generatedImageName: null
   };

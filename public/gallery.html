@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud9 Roster Moment - Event Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a192f;
+            --accent-blue: #00aeef;
+            --accent-cyan: #00d4ff;
+            --text-white: #e6f1ff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-white);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header img {
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            background: rgba(0, 174, 239, 0.05);
+            border: 1px solid rgba(0, 174, 239, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 174, 239, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+
+        .gallery-info {
+            padding: 1rem;
+        }
+
+        .gallery-role {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+        }
+
+        .gallery-style {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .gallery-player {
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            margin-top: 0.3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-dim);
+        }
+
+        .empty-state h2 {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-white);
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-dim);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <img src="/cloud9-logo.svg" alt="Cloud9">
+        <h1>🖼️ Event Gallery</h1>
+        <p class="subtitle">Posters created by our community</p>
+    </div>
+
+    <div id="gallery" class="loading">Loading gallery...</div>
+
+    <div style="text-align: center;">
+        <a href="/" class="back-link">← Back to App</a>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3001'
+            : 'https://cloud9-roster-moment.onrender.com';
+
+        async function loadGallery() {
+            const container = document.getElementById('gallery');
+
+            try {
+                const res = await fetch(`${API_URL}/gallery`);
+                const data = await res.json();
+
+                if (data.items && data.items.length > 0) {
+                    container.className = 'gallery-grid';
+                    container.innerHTML = data.items.map(item => `
+            <div class="gallery-item">
+              <img src="${API_URL}${item.imageUrl}" alt="${item.role} poster" loading="lazy">
+              <div class="gallery-info">
+                <div class="gallery-role">${item.role}</div>
+                <div class="gallery-style">${item.style}</div>
+                ${item.player ? `<div class="gallery-player">★ Fan of ${item.player}</div>` : ''}
+              </div>
+            </div>
+          `).join('');
+                } else {
+                    container.className = 'empty-state';
+                    container.innerHTML = `
+            <h2>No posters yet</h2>
+            <p>Be the first to share your Roster Moment!</p>
+            <a href="/" class="back-link">Create Your Poster →</a>
+          `;
+                }
+            } catch (err) {
+                console.error('Error loading gallery:', err);
+                container.className = 'empty-state';
+                container.innerHTML = `
+          <h2>Could not load gallery</h2>
+          <p>Please try again later</p>
+        `;
+            }
+        }
+
+        loadGallery();
+        // Auto-refresh every 30 seconds
+        setInterval(loadGallery, 30000);
+    </script>
+</body>
+
+</html>

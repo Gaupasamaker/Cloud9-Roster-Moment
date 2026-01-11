@@ -55,14 +55,16 @@ db.exec(`
     ip_address TEXT,
     role TEXT,
     style TEXT,
-    favorite_player TEXT
+    favorite_player TEXT,
+    show_in_gallery BOOLEAN DEFAULT 0,
+    image_name TEXT
   )
 `);
 
 console.log('📊 Base de datos SQLite inicializada');
 
 // Función para guardar email con consentimiento
-function saveEmailWithConsent(email, consent, ipAddress, role, style, favoritePlayer) {
+function saveEmailWithConsent(email, consent, ipAddress, role, style, favoritePlayer, showInGallery, imageName) {
   const CONSENT_TEXT = 'I agree to receive my poster via email and communications from Cloud9';
 
   if (!consent) {
@@ -72,13 +74,13 @@ function saveEmailWithConsent(email, consent, ipAddress, role, style, favoritePl
 
   try {
     const stmt = db.prepare(`
-      INSERT OR IGNORE INTO subscribers (email, consent, consent_text, ip_address, role, style, favorite_player)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO subscribers (email, consent, consent_text, ip_address, role, style, favorite_player, show_in_gallery, image_name)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const result = stmt.run(email, 1, CONSENT_TEXT, ipAddress, role, style, favoritePlayer || null);
+    const result = stmt.run(email, 1, CONSENT_TEXT, ipAddress, role, style, favoritePlayer || null, showInGallery ? 1 : 0, imageName || null);
 
     if (result.changes > 0) {
-      console.log(`✅ Email guardado en BD: ${email}`);
+      console.log(`✅ Email guardado en BD: ${email}, Gallery: ${showInGallery ? 'Yes' : 'No'}`);
       return { saved: true };
     } else {
       console.log(`ℹ️ Email ya existía en BD: ${email}`);
@@ -248,7 +250,7 @@ ${negativePrompt}`;
 
 // Endpoint principal
 app.post('/generate', async (req, res) => {
-  const { role, style, email, photo, consent, favoritePlayer } = req.body;
+  const { role, style, email, photo, consent, favoritePlayer, showInGallery } = req.body;
 
   // Obtener IP del cliente para cumplimiento GDPR
   const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
@@ -259,12 +261,11 @@ app.post('/generate', async (req, res) => {
   console.log('Email:', email);
   console.log('Favorite Player:', favoritePlayer);
   console.log('Consent:', consent ? 'Yes' : 'No');
+  console.log('Show in Gallery:', showInGallery ? 'Yes' : 'No');
   console.log('Photo received:', photo ? 'Yes' : 'No');
 
-  // Guardar email en BD si hay consentimiento
-  if (email && consent) {
-    saveEmailWithConsent(email, consent, clientIP, role, style, favoritePlayer);
-  }
+  // El email y la galería se guardarán después de generar la imagen para tener el nombre del archivo
+  let imageName = null;
 
   try {
     const model = genAI.getGenerativeModel({
@@ -376,6 +377,11 @@ app.post('/generate', async (req, res) => {
             sendPosterEmail(email, imageData).then(success => {
               console.log(success ? '✅ Background email sent' : '❌ Background email failed');
             });
+          }
+
+          // Guardar email en BD con el nombre de imagen y opt-in de galería
+          if (email && consent) {
+            saveEmailWithConsent(email, consent, clientIP, role, style, favoritePlayer, showInGallery, fileName);
           }
 
           console.log('Sending response to frontend...');
@@ -495,6 +501,32 @@ app.get('/stats', (req, res) => {
       byPlayer,
       byHour,
       lastUpdated: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint para la galería pública (solo muestra posters con opt-in)
+app.get('/gallery', (req, res) => {
+  try {
+    const galleryItems = db.prepare(`
+      SELECT role, style, favorite_player, image_name, created_at 
+      FROM subscribers 
+      WHERE show_in_gallery = 1 AND image_name IS NOT NULL
+      ORDER BY created_at DESC
+      LIMIT 50
+    `).all();
+
+    res.json({
+      count: galleryItems.length,
+      items: galleryItems.map(item => ({
+        role: item.role,
+        style: item.style,
+        player: item.favorite_player,
+        imageUrl: `/generated/${item.image_name}`,
+        createdAt: item.created_at
+      }))
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
