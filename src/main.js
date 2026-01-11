@@ -148,9 +148,11 @@ window.handleEmail = (event) => {
 };
 
 // Configuración de la API - Cambiar por la URL de producción al desplegar el backend
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3001'
-  : 'https://tu-backend-en-render.onrender.com'; // Sustituir por la URL real de Render/Railway
+const API_URL =
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3001'
+    : 'https://cloud9-roster-moment.onrender.com'; // Sustituir por la URL real de Render/Railway
 
 window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
