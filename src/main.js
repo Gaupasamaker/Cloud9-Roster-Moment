@@ -17,11 +17,11 @@ let state = {
 // Datos de jugadores Cloud9
 const API_BASE = 'https://cloud9-roster-moment.onrender.com';
 const PLAYERS = [
-  { id: 'player1', name: 'Thanatos', role: 'Top', image: `${API_BASE}/api/players/player1.png` },
-  { id: 'player2', name: 'Blaber', role: 'Jungle', image: `${API_BASE}/api/players/player2.png` },
-  { id: 'player3', name: 'Zven', role: 'Mid', image: `${API_BASE}/api/players/player3.png` },
-  { id: 'player4', name: 'APA', role: 'ADC', image: `${API_BASE}/api/players/player4.png` },
-  { id: 'player5', name: 'Vulcan', role: 'Support', image: `${API_BASE}/api/players/player5.png` }
+  { id: 'player1', name: 'Thanatos', role: 'Top', image: `${API_BASE}/api/players/player1.webp` },
+  { id: 'player2', name: 'Blaber', role: 'Jungle', image: `${API_BASE}/api/players/player2.webp` },
+  { id: 'player3', name: 'Zven', role: 'Mid', image: `${API_BASE}/api/players/player3.webp` },
+  { id: 'player4', name: 'APA', role: 'ADC', image: `${API_BASE}/api/players/player4.webp` },
+  { id: 'player5', name: 'Vulcan', role: 'Support', image: `${API_BASE}/api/players/player5.webp` }
 ];
 
 // Header con logo Cloud9 que aparece en todas las pantallas

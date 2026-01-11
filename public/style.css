@@ -333,6 +333,12 @@
   filter: drop-shadow(0 0 10px rgba(0, 174, 239, 0.4));
 }
 
+/* Ajuste específico para Support icon que parece descuadrado */
+.role-card:last-child .role-icon img {
+  padding: 5px;
+}
+
+
 .role-card:hover .role-icon {
   transform: scale(1.1);
 }
