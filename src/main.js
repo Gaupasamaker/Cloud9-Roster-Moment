@@ -57,6 +57,9 @@ const screens = {
       <div class="loader"></div>
       <h2>Generando tu Roster Moment...</h2>
       <p class="generating-text">Creando tu póster épico</p>
+      <div id="status-log" style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5; color: #64ffda;">
+        Iniciando conexión con el servidor...
+      </div>
     </div>
   `,
   result: () => {
@@ -159,8 +162,11 @@ window.nextScreen = async () => {
     state.currentScreen = 'generating';
     render();
     
+    const statusLog = document.getElementById('status-log');
+    
     try {
-      console.log('Enviando datos a:', `${API_URL}/generate`);
+      if(statusLog) statusLog.innerText = `Llamando a: ${API_URL}...`;
+      
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
         headers: {
@@ -174,23 +180,28 @@ window.nextScreen = async () => {
         })
       });
 
+      if(statusLog) statusLog.innerText = 'Recibiendo respuesta de la IA...';
+
       if (!response.ok) {
         throw new Error(`Error en la petición: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Respuesta del servidor:', data);
+      if(statusLog) statusLog.innerText = '¡Imagen generada con éxito!';
       
       if (data.imageUrl) {
         state.generatedImage = data.imageUrl;
       }
     } catch (error) {
       console.error('Error detallado:', error);
-      alert('Hubo un problema al conectar con el servidor de IA. Mostrando preview original.');
+      if(statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
+      alert(`Error de conexión: ${error.message}`);
     } finally {
-      // 2. Ir a la pantalla de resultados pase lo que pase al terminar el fetch
-      state.currentScreen = 'result';
-      render();
+      // Pequeña espera para que se vea el mensaje de éxito antes de cambiar
+      setTimeout(() => {
+        state.currentScreen = 'result';
+        render();
+      }, 1000);
     }
   } else if (currentIndex < screenKeys.length - 1) {
     state.currentScreen = screenKeys[currentIndex + 1];
