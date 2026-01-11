@@ -11,11 +11,19 @@ let state = {
   generatedImageName: null
 };
 
+// Header con logo Cloud9 que aparece en todas las pantallas
+const headerComponent = () => `
+  <header class="cloud9-header">
+    <img src="/cloud9-logo.svg" alt="Cloud9" class="cloud9-logo">
+  </header>
+`;
+
 const screens = {
   role: () => `
+    ${headerComponent()}
     <div class="screen">
-      <h1 style="margin-top: 2rem">🎮 Roster Moment</h1>
-      <p style="margin-bottom: 1rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Join the Team</p>
+      <h1 class="app-title">🎮 Roster Moment</h1>
+      <p class="subtitle">Join the Team</p>
       <h2>Select your Role</h2>
       <div class="grid">
         <button onclick="setRole('Top')">🛡️ Top Lane</button>
@@ -27,23 +35,25 @@ const screens = {
     </div>
   `,
   photo: () => `
+    ${headerComponent()}
     <div class="screen">
-      <h2 style="margin-top: 2rem">Upload your Photo</h2>
-      <p style="color: var(--text-dim); margin-bottom: 1rem;">Show us your game face</p>
+      <h2>Upload your Photo</h2>
+      <p class="subtitle-dim">Show us your game face</p>
       <div style="position: relative;">
         <input type="file" accept="image/*" capture="user" id="photoInput" onchange="handlePhoto(event)" style="opacity: 0; position: absolute; z-index: -1;">
-        <button onclick="document.getElementById('photoInput').click()" id="uploadBtn" style="background: rgba(255,255,255,0.05);">📸 Take / Select Photo</button>
+        <button onclick="document.getElementById('photoInput').click()" id="uploadBtn" class="upload-btn">📸 Take / Select Photo</button>
       </div>
       <div id="previewContainer"></div>
-      <button onclick="nextScreen()" id="nextBtn" disabled style="background: var(--accent-blue); color: #0a192f;">Continue ➔</button>
+      <button onclick="nextScreen()" id="nextBtn" disabled class="primary-btn">Continue ➔</button>
       <button class="secondary-btn" onclick="prevScreen()">Back to Roles</button>
     </div>
   `,
   style: () => {
     return `
+    ${headerComponent()}
     <div class="screen">
-      <h2 style="margin-top: 2rem">Finalize Your Poster</h2>
-      <p style="color: var(--text-dim); margin-bottom: 1rem;">Choose your artistic style</p>
+      <h2>Finalize Your Poster</h2>
+      <p class="subtitle-dim">Choose your artistic style</p>
       <div class="grid">
         <button class="style-btn" 
                 id="style-Painted-Hype" 
@@ -56,22 +66,26 @@ const screens = {
                 onclick="window.handleStyleSelection('Social Media Avatar', this)">👤 Pro Avatar</button>
       </div>
       
-      <div style="margin-top: 2rem; text-align: left; background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
-        <label for="emailInput" style="display: block; margin-bottom: 0.8rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--accent-blue); letter-spacing: 1px;">Where should we send your poster?</label>
+      <div class="email-input-container">
+        <label for="emailInput" class="email-label">Where should we send your poster?</label>
         <input type="email" id="emailInput" placeholder="Enter your email address" value="${state.email}" oninput="handleEmail(event)">
       </div>
       
-      <button onclick="nextScreen()" style="margin-top: 1rem; background: var(--accent-blue); color: #0a192f; font-size: 1.2rem;">Generate Result 🏆</button>
+      <button onclick="nextScreen()" class="generate-btn">Generate Result 🏆</button>
       <button class="secondary-btn" onclick="prevScreen()">Change Photo</button>
     </div>
   `;
   },
   generating: () => `
+    ${headerComponent()}
     <div class="screen generating-screen">
-      <div class="loader"></div>
+      <div class="loader-container">
+        <div class="loader"></div>
+        <div class="loader-glow"></div>
+      </div>
       <div class="generating-text">Initializing AI</div>
-      <p style="color: var(--text-dim); margin-top: 0.5rem; font-size: 0.9rem;">Processing visual blueprints...</p>
-      <div id="status-log" style="font-size: 0.7rem; margin-top: 3rem; opacity: 0.4; font-family: monospace;">
+      <p class="subtitle-dim">Processing visual blueprints...</p>
+      <div id="status-log" class="status-log">
         Establishing secure uplink...
       </div>
     </div>
@@ -93,19 +107,20 @@ const screens = {
       Support: "✨"
     };
 
-    const qrUrl = state.generatedImage && !state.generatedImage.startsWith('data:') 
-      ? state.generatedImage 
+    const qrUrl = state.generatedImage && !state.generatedImage.startsWith('data:')
+      ? state.generatedImage
       : `https://cloud9-roster-moment.onrender.com/generated/${state.generatedImageName || ''}`;
 
     return `
+    ${headerComponent()}
     <div class="screen">
-      <h1>🏆 YOUR ROSTER MOMENT</h1>
+      <h1 class="result-title">🏆 YOUR ROSTER MOMENT</h1>
       <div class="result-card">
-        ${state.generatedImage 
-          ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado" onclick="window.zoomImage()">`
-          : state.photo 
-            ? `<img src="${state.photo}" class="photo-preview-large" alt="Previsualización de foto">` 
-            : '<div class="placeholder-img">No Photo</div>'}
+        ${state.generatedImage
+        ? `<img src="${state.generatedImage}" class="photo-preview-large" alt="Póster generado" onclick="window.zoomImage()">`
+        : state.photo
+          ? `<img src="${state.photo}" class="photo-preview-large" alt="Previsualización de foto">`
+          : '<div class="placeholder-img">No Photo</div>'}
         <h2 class="role-display">${roleEmojis[state.role] || ''} ${state.role.toUpperCase()}</h2>
         <p class="style-name">${state.style}</p>
         <p class="personality-msg">"${personality[state.role] || ''}"</p>
@@ -124,7 +139,7 @@ const screens = {
         </div>
       ` : ''}
       <div class="email-sent">📧 Registered: ${state.email}</div>
-      <button onclick="resetApp()">🔄 Create Another</button>
+      <button onclick="resetApp()" class="create-another-btn">🔄 Create Another</button>
     </div>
   `;
   }
@@ -134,9 +149,9 @@ function render() {
   const dots = document.querySelectorAll('.dot');
   const screenKeys = Object.keys(screens);
   const currentIndex = screenKeys.indexOf(state.currentScreen);
-  
+
   app.innerHTML = screens[state.currentScreen]();
-  
+
   dots.forEach((dot, index) => {
     dot.classList.toggle('active', index === currentIndex);
   });
@@ -155,7 +170,7 @@ window.handlePhoto = (event) => {
     const container = document.getElementById('previewContainer');
     container.innerHTML = `<img src="${state.photo}" class="photo-preview" alt="Preview">`;
     document.getElementById('nextBtn').disabled = false;
-    
+
     // Convertir a base64 para enviar al servidor
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -173,11 +188,11 @@ window.setStyle = (style) => {
 
 window.handleStyleSelection = (style, element) => {
   state.style = style;
-  
+
   // Actualización parcial del DOM para evitar el "flash" de render()
   const btns = document.querySelectorAll('.style-btn');
   btns.forEach(btn => btn.classList.remove('selected'));
-  
+
   if (element) {
     element.classList.add('selected');
   }
@@ -203,17 +218,17 @@ const API_URL = 'https://cloud9-roster-moment.onrender.com';
 window.nextScreen = async () => {
   const screenKeys = Object.keys(screens);
   const currentIndex = screenKeys.indexOf(state.currentScreen);
-  
+
   // El trigger ahora es la pantalla 'style' (donde está el botón "Ver Resultado")
   if (state.currentScreen === 'style') {
     state.currentScreen = 'generating';
     render();
-    
+
     const statusLog = document.getElementById('status-log');
-    
+
     try {
-      if(statusLog) statusLog.innerText = `Connecting to the AI server...`;
-      
+      if (statusLog) statusLog.innerText = `Connecting to the AI server...`;
+
       const response = await fetch(`${API_URL}/generate`, {
         method: 'POST',
         headers: {
@@ -227,19 +242,19 @@ window.nextScreen = async () => {
         })
       });
 
-      if(statusLog) statusLog.innerText = 'Receiving AI response...';
+      if (statusLog) statusLog.innerText = 'Receiving AI response...';
 
       if (!response.ok) {
         throw new Error(`Request error: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      if(statusLog) statusLog.innerText = 'Image generated successfully!';
-      
+      if (statusLog) statusLog.innerText = 'Image generated successfully!';
+
       if (data.imageUrl) {
         state.generatedImage = data.imageUrl;
       }
-      
+
       // Fallback: Si el servidor envía la imagen en Base64, usarla (más fiable en producción)
       if (data.imageBase64) {
         state.generatedImage = `data:image/jpeg;base64,${data.imageBase64}`;
@@ -250,7 +265,7 @@ window.nextScreen = async () => {
       }
     } catch (error) {
       console.error('Error detallado:', error);
-      if(statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
+      if (statusLog) statusLog.innerText = `❌ Error: ${error.message}`;
       alert(`Error de conexión: ${error.message}`);
     } finally {
       // Pequeña espera para que se vea el mensaje de éxito antes de cambiar
