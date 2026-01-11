@@ -285,11 +285,7 @@
   margin-top: 1rem;
 }
 
-.role-grid .role-card:last-child {
-  grid-column: span 2;
-  max-width: 50%;
-  justify-self: center;
-}
+/* Support alinea correctamente en grid 2col */
 
 .role-card {
   display: flex;
@@ -333,10 +329,7 @@
   filter: drop-shadow(0 0 10px rgba(0, 174, 239, 0.4));
 }
 
-/* Ajuste específico para Support icon que parece descuadrado */
-.role-card:last-child .role-icon img {
-  padding: 5px;
-}
+
 
 
 .role-card:hover .role-icon {
