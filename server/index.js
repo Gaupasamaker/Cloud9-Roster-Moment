@@ -47,6 +47,12 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
 
   // Debug de la clave (enmascarada)
   console.log(`📧 DEBUG: API Key cargada. Longitud: ${apiKey.length}`);
+  
+  if (apiKey.length < 30) {
+    console.warn('⚠️ WARNING: La clave de API es muy corta. Probablemente estés usando el SMTP Password en lugar de la API Key v3.');
+    console.log('👉 Ve a Brevo -> SMTP & API -> API Keys para obtener la clave correcta.');
+  }
+
   if (apiKey.length > 10) {
     console.log(`📧 DEBUG: Clave empieza por: ${apiKey.substring(0, 6)}... y termina en: ...${apiKey.substring(apiKey.length - 4)}`);
   } else {
