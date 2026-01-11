@@ -1,0 +1,260 @@
+:root {
+  --primary-bg: linear-gradient(180deg, #0a192f 0%, #112240 100%);
+  --accent-blue: #64ffda;
+  --text-white: #e6f1ff;
+  --button-bg: rgba(100, 255, 218, 0.1);
+  --button-hover: rgba(100, 255, 218, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  max-width: 500px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+button {
+  background: var(--button-bg);
+  border: 1px solid var(--accent-blue);
+  color: var(--accent-blue);
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background: var(--button-hover);
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.secondary-btn {
+  background: transparent;
+  border-color: rgba(230, 241, 255, 0.3);
+  color: var(--text-white);
+  margin-top: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+input[type="email"], input[type="file"] {
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input[type="email"]:focus {
+  border-color: var(--accent-blue);
+  background: rgba(100, 255, 218, 0.05);
+}
+
+.footer {
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(230, 241, 255, 0.2);
+}
+
+.dot.active {
+  background: var(--accent-blue);
+  box-shadow: 0 0 10px var(--accent-blue);
+}
+
+.photo-preview {
+  width: 100%;
+  max-width: 250px;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 1rem auto;
+  border: 3px solid var(--accent-blue);
+  display: block;
+}
+
+.photo-preview-large {
+  width: 100%;
+  max-width: 320px; /* Un poco más grande para el modo Pro */
+  aspect-ratio: 4/5;
+  object-fit: contain; /* Cambiado de cover a contain para ver la imagen completa */
+  background: rgba(0,0,0,0.2);
+  border-radius: 16px;
+  border: 4px solid var(--accent-blue);
+  margin: 0 auto 1.5rem;
+  display: block;
+}
+
+.role-display {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+  color: var(--accent-blue);
+}
+
+.style-name {
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+}
+
+.personality-msg {
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 1rem;
+  background: rgba(100, 255, 218, 0.1);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.email-sent {
+  font-size: 0.9rem;
+  opacity: 0.6;
+  margin-top: 1rem;
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+}
+
+.qr-label {
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+#qr-code {
+  border-radius: 8px;
+}
+
+.qr-image {
+  border-radius: 8px;
+  background: white;
+  padding: 8px;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2.5rem 1.5rem;
+  border-radius: 24px;
+  border: 2px solid var(--accent-blue);
+  backdrop-filter: blur(10px);
+  margin-bottom: 2rem;
+}
+
+.placeholder-img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(100, 255, 218, 0.1);
+  border-top: 5px solid var(--accent-blue);
+  border-radius: 50%;
+  margin: 2rem auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.generating-screen {
+  padding-top: 4rem;
+}
+
+.generating-text {
+  opacity: 0.8;
+  margin-top: 1rem;
+}
