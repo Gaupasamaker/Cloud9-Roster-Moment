@@ -190,11 +190,20 @@ input[type="email"]:focus {
 }
 
 .modal-content {
-  max-width: 100%;
-  max-height: 80vh;
+  width: auto;
+  height: auto;
+  max-width: 95vw; /* Máximo ancho de la pantalla con margen */
+  max-height: 90vh; /* Máximo alto de la pantalla con margen */
+  object-fit: contain; /* Asegura que la imagen se vea completa sin recortes */
   border-radius: 12px;
   border: 2px solid var(--accent-blue);
-  box-shadow: 0 0 30px rgba(100, 255, 218, 0.3);
+  box-shadow: 0 0 50px rgba(100, 255, 218, 0.5);
+  animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .close-modal {
