@@ -130,7 +130,16 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
         sender: { name: "Roster Moment", email: senderEmail },
         to: [{ email: toEmail }],
         subject: "Your Roster Moment is here! 🏆",
-        textContent: "Hi! Here is your epic Cloud9 poster. We hope you like it!",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #0099ff;">Hi! Here is your epic Cloud9 poster.</h2>
+            <p>We hope you like it! You can share this epic moment on your social media. Don't forget to tag <strong>@Cloud9</strong> and use <strong>#RosterMoment</strong>!</p>
+            <p>Thanks for your support!</p>
+            <br>
+            <p><strong>The Cloud9 Team</strong></p>
+            <img src="https://cloud9-roster-moment.onrender.com/logo-roster-moment.png" alt="Cloud9 Roster Moment" style="width: 150px; margin-top: 10px;">
+          </div>
+        `,
         attachment: [
           {
             name: "roster-moment.png",
