@@ -137,7 +137,7 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
             <p>Thanks for your support!</p>
             <br>
             <p><strong>The Cloud9 Team</strong></p>
-            <img src="https://cloud9-roster-moment.onrender.com/cloud9-logo.svg" alt="Cloud9" style="width: 100px; margin-top: 10px;">
+            <img src="https://cloud9-roster-moment.onrender.com/cloud9-logo.png" alt="Cloud9" style="width: 100px; margin-top: 10px;">
           </div>
         `,
         attachment: [
@@ -168,11 +168,11 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 // Servir imágenes generadas - Usar ruta absoluta para mayor seguridad
-const generatedDir = path.join(__dirname, 'generated');
+const generatedDir = path.join(__dirname, '../public/generated');
 if (!fs.existsSync(generatedDir)) {
   fs.mkdirSync(generatedDir, { recursive: true });
 }
-app.use('/generated', express.static(generatedDir));
+// app.use('/generated', express.static(generatedDir)); // Ya no es necesario, se sirve desde public
 
 // Servir imágenes de jugadores
 const playersDir = path.join(__dirname, 'assets', 'players');
