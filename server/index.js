@@ -378,11 +378,24 @@ app.post('/generate', async (req, res) => {
           const extension = mimeType.split('/')[1] || 'png';
 
           const fileName = `roster_${Date.now()}.${extension}`;
-          const filePath = path.join(generatedDir, fileName);
+          // Ensure directory exists securely
+          const saveDir = path.resolve(__dirname, '../public/generated');
+          if (!fs.existsSync(saveDir)) {
+            fs.mkdirSync(saveDir, { recursive: true });
+          }
+          const filePath = path.join(saveDir, fileName);
 
           // Verificamos el buffer antes de escribir
           const buffer = Buffer.from(imageData, 'base64');
           console.log('Created buffer size:', buffer.length, 'bytes');
+
+          try {
+            fs.writeFileSync(filePath, buffer);
+            console.log('✅ File written successfully to:', filePath);
+          } catch (writeError) {
+            console.error('❌ Error writing file to disk:', writeError);
+            throw writeError; // Re-throw to trigger catch block
+          }
 
           imageUrl = `https://cloud9-roster-moment.onrender.com/generated/${fileName}`;
           console.log('Image saved and accessible at public URL:', imageUrl);
