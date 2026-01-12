@@ -65,7 +65,9 @@
 
 .subtitle-dim {
   color: var(--text-dim);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  /* Aumentado para separar del contenido */
+  margin-top: 0;
   font-size: 0.9rem;
 }
 
@@ -489,9 +491,11 @@ h2 {
   font-size: 1.8rem;
   margin-top: 0;
   /* Asegurar que no haya margen extra */
-  margin-bottom: 1rem;
-  /* Reducido ligeramente también */
+  margin-bottom: 0.2rem;
+  /* Muy pegado si hay subtítulo debajo */
   color: var(--text-white);
+  line-height: 1.1;
+  /* Mejor lectura en títulos largos */
 }
 
 #app {
