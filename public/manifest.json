@@ -6,11 +6,12 @@
   "display": "standalone",
   "background_color": "#0a192f",
   "theme_color": "#0a192f",
-  {
-    "src": "/logo-roster-moment.png",
-    "sizes": "1024x1024",
-    "type": "image/png",
-    "purpose": "any maskable"
-  }
-]
+  "icons": [
+    {
+      "src": "/logo-roster-moment.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
