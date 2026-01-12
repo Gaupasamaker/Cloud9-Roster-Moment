@@ -289,6 +289,8 @@
   max-width: 90%;
   height: auto;
   max-height: 280px;
+  /* Screen mode elimina el negro puro y los bordes oscuros, dejando solo la luz */
+  mix-blend-mode: screen;
   filter: drop-shadow(0 0 20px rgba(0, 174, 239, 0.6));
   animation: logoPulse 3s infinite ease-in-out;
 }
