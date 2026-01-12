@@ -288,9 +288,7 @@
 .main-logo-hero {
   max-width: 90%;
   height: auto;
-  max-height: 250px;
-  /* Truco para fondo negro: screen mode lo hace transparente sobre fondo oscuro */
-  mix-blend-mode: screen;
+  max-height: 280px;
   filter: drop-shadow(0 0 20px rgba(0, 174, 239, 0.6));
   animation: logoPulse 3s infinite ease-in-out;
 }
