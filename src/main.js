@@ -33,9 +33,10 @@ const headerComponent = () => `
 
 const screens = {
   role: () => `
-    ${headerComponent()}
+    <header class="home-header">
+      <img src="/logo-roster-moment.png" alt="Roster Moment" class="main-logo-hero">
+    </header>
     <div class="screen">
-      <h1 class="app-title">🎮 Roster Moment</h1>
       <p class="subtitle">Join the Team</p>
       <h2>Select your Role</h2>
       <div class="role-grid">
