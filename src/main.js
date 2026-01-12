@@ -89,7 +89,7 @@ const screens = {
           </button>
         `).join('')}
       </div>
-      <button class="secondary-btn" onclick="prevScreen()">Back to Roles</button>
+      <button class="secondary-btn" onclick="prevScreen()">Back to Players</button>
     </div>
   `,
   photo: () => `
@@ -103,7 +103,7 @@ const screens = {
       </div>
       <div id="previewContainer"></div>
       <button onclick="nextScreen()" id="nextBtn" disabled class="primary-btn">Continue ➔</button>
-      <button class="secondary-btn" onclick="prevScreen()">Back to Roles</button>
+      <button class="secondary-btn" onclick="prevScreen()">Back to Players</button>
     </div>
   `,
   style: () => {

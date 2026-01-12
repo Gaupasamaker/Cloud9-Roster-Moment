@@ -137,7 +137,7 @@ async function sendPosterEmail(toEmail, imageDataBase64) {
             <p>Thanks for your support!</p>
             <br>
             <p><strong>The Cloud9 Team</strong></p>
-            <img src="https://cloud9-roster-moment.onrender.com/logo-roster-moment.png" alt="Cloud9 Roster Moment" style="width: 150px; margin-top: 10px;">
+            <img src="https://cloud9-roster-moment.onrender.com/cloud9-logo.svg" alt="Cloud9" style="width: 100px; margin-top: 10px;">
           </div>
         `,
         attachment: [

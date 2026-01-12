@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloud9 Roster Moment - Live Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Montserrat:wght@400;700&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -13,11 +16,15 @@
       --accent-blue: #00aeef;
       --accent-cyan: #00d4ff;
       --text-white: #e6f1ff;
-      --text-dim: rgba(255,255,255,0.6);
+      --text-dim: rgba(255, 255, 255, 0.6);
     }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Montserrat', sans-serif;
       background: var(--primary-bg);
@@ -25,17 +32,17 @@
       min-height: 100vh;
       padding: 2rem;
     }
-    
+
     .header {
       text-align: center;
       margin-bottom: 2rem;
     }
-    
+
     .header img {
       height: 50px;
       margin-bottom: 1rem;
     }
-    
+
     h1 {
       font-family: 'Rajdhani', sans-serif;
       font-size: 2rem;
@@ -45,7 +52,7 @@
       background-clip: text;
       color: transparent;
     }
-    
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -53,14 +60,14 @@
       max-width: 1400px;
       margin: 0 auto;
     }
-    
+
     .stat-card {
       background: rgba(0, 174, 239, 0.05);
       border: 1px solid rgba(0, 174, 239, 0.2);
       border-radius: 12px;
       padding: 1.5rem;
     }
-    
+
     .stat-card h2 {
       font-family: 'Rajdhani', sans-serif;
       font-size: 1rem;
@@ -68,7 +75,7 @@
       color: var(--accent-blue);
       margin-bottom: 1rem;
     }
-    
+
     .big-number {
       font-family: 'Rajdhani', sans-serif;
       font-size: 5rem;
@@ -80,47 +87,50 @@
       color: transparent;
       text-shadow: 0 0 30px rgba(0, 174, 239, 0.5);
     }
-    
+
     .chart-container {
       height: 250px;
     }
-    
+
     .last-updated {
       text-align: center;
       margin-top: 2rem;
       font-size: 0.8rem;
       color: var(--text-dim);
     }
-    
-    .refreshing { opacity: 0.6; }
+
+    .refreshing {
+      opacity: 0.6;
+    }
   </style>
 </head>
+
 <body>
   <div class="header">
-    <img src="/cloud9-logo.svg" alt="Cloud9">
+    <img src="/logo-roster-moment.png" alt="Cloud9">
     <h1>📊 Live Event Dashboard</h1>
   </div>
-  
+
   <div class="stats-grid">
     <div class="stat-card">
       <h2>Total Posters Generated</h2>
       <div class="big-number" id="total">-</div>
     </div>
-    
+
     <div class="stat-card">
       <h2>By Role</h2>
       <div class="chart-container">
         <canvas id="roleChart"></canvas>
       </div>
     </div>
-    
+
     <div class="stat-card">
       <h2>By Style</h2>
       <div class="chart-container">
         <canvas id="styleChart"></canvas>
       </div>
     </div>
-    
+
     <div class="stat-card">
       <h2>Fan Favorite Player</h2>
       <div class="chart-container">
@@ -128,31 +138,31 @@
       </div>
     </div>
   </div>
-  
+
   <div class="last-updated" id="lastUpdated">Loading...</div>
 
   <script>
-    const API_URL = window.location.hostname === 'localhost' 
-      ? 'http://localhost:3001' 
+    const API_URL = window.location.hostname === 'localhost'
+      ? 'http://localhost:3001'
       : 'https://cloud9-roster-moment.onrender.com';
-    
+
     let roleChart, styleChart, playerChart;
-    
+
     const chartColors = [
       '#00aeef', '#00d4ff', '#3d8bfd', '#6610f2', '#e83e8c'
     ];
-    
+
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { 
+        legend: {
           position: 'bottom',
           labels: { color: '#e6f1ff', font: { family: 'Rajdhani' } }
         }
       }
     };
-    
+
     function createBarChart(ctx, labels, data) {
       return new Chart(ctx, {
         type: 'bar',
@@ -174,7 +184,7 @@
         }
       });
     }
-    
+
     function createDoughnutChart(ctx, labels, data) {
       return new Chart(ctx, {
         type: 'doughnut',
@@ -189,53 +199,67 @@
         options: chartOptions
       });
     }
-    
+
     async function fetchStats() {
       document.body.classList.add('refreshing');
       try {
         const res = await fetch(`${API_URL}/stats`);
         const data = await res.json();
-        
+
         document.getElementById('total').textContent = data.total || 0;
-        
-        if (data.byRole?.length) {
-          if (roleChart) roleChart.destroy();
-          roleChart = createBarChart(
-            document.getElementById('roleChart'),
-            data.byRole.map(r => r.role || 'Unknown'),
-            data.byRole.map(r => r.count)
-          );
-        }
-        
-        if (data.byStyle?.length) {
-          if (styleChart) styleChart.destroy();
-          styleChart = createDoughnutChart(
-            document.getElementById('styleChart'),
-            data.byStyle.map(s => s.style || 'Unknown'),
-            data.byStyle.map(s => s.count)
-          );
-        }
-        
-        if (data.byPlayer?.length) {
-          if (playerChart) playerChart.destroy();
-          playerChart = createBarChart(
-            document.getElementById('playerChart'),
-            data.byPlayer.map(p => p.player || 'Unknown'),
-            data.byPlayer.map(p => p.count)
-          );
-        }
-        
-        document.getElementById('lastUpdated').textContent = 
+
+        // Defined categories to ensure charts always show comparison data
+        const ALL_ROLES = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+        const ALL_STYLES = ['Painted Hype', 'Hype Match Day', 'Social Media Avatar'];
+        const ALL_PLAYERS = ['Thanatos', 'Blaber', 'Zven', 'APA', 'Vulcan'];
+
+        // Helper to merge data with defaults
+        const mergeData = (categories, incomingData, keyName) => {
+          return categories.map(cat => {
+            const found = incomingData?.find(d => d[keyName] === cat);
+            return { label: cat, count: found ? found.count : 0 };
+          });
+        };
+
+        // Update Role Chart
+        const roleData = mergeData(ALL_ROLES, data.byRole, 'role');
+        if (roleChart) roleChart.destroy();
+        roleChart = createBarChart(
+          document.getElementById('roleChart'),
+          roleData.map(d => d.label),
+          roleData.map(d => d.count)
+        );
+
+        // Update Style Chart
+        const styleData = mergeData(ALL_STYLES, data.byStyle, 'style');
+        if (styleChart) styleChart.destroy();
+        styleChart = createDoughnutChart(
+          document.getElementById('styleChart'),
+          styleData.map(d => d.label),
+          styleData.map(d => d.count)
+        );
+
+        // Update Player Chart
+        const playerData = mergeData(ALL_PLAYERS, data.byPlayer, 'player');
+        if (playerChart) playerChart.destroy();
+        playerChart = createBarChart(
+          document.getElementById('playerChart'),
+          playerData.map(d => d.label),
+          playerData.map(d => d.count)
+        );
+
+        document.getElementById('lastUpdated').textContent =
           `Last updated: ${new Date(data.lastUpdated).toLocaleTimeString()}`;
       } catch (err) {
         console.error('Error fetching stats:', err);
       }
       document.body.classList.remove('refreshing');
     }
-    
+
     // Initial load and auto-refresh every 10 seconds
     fetchStats();
     setInterval(fetchStats, 10000);
   </script>
 </body>
+
 </html>
