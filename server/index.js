@@ -172,7 +172,22 @@ const generatedDir = path.join(__dirname, '../public/generated');
 if (!fs.existsSync(generatedDir)) {
   fs.mkdirSync(generatedDir, { recursive: true });
 }
-// app.use('/generated', express.static(generatedDir)); // Ya no es necesario, se sirve desde public
+
+// Manual route to serve generated images (more robust than static for dynamic files on some hosts)
+app.get('/generated/:filename', (req, res) => {
+  const filepath = path.join(generatedDir, req.params.filename);
+  // Prevent directory traversal
+  if (!filepath.startsWith(generatedDir)) {
+    return res.status(403).send('Forbidden');
+  }
+
+  if (fs.existsSync(filepath)) {
+    res.sendFile(filepath);
+  } else {
+    console.error(`❌ Image not found: ${filepath}`);
+    res.status(404).send('Not found');
+  }
+});
 
 // Servir imágenes de jugadores
 const playersDir = path.join(__dirname, 'assets', 'players');
