@@ -54,7 +54,8 @@
 }
 
 .subtitle {
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
+  /* Reducido para compactar */
   color: var(--accent-blue);
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -281,7 +282,8 @@
 .home-header {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.2rem;
+  /* Reducido para acercar texto */
   padding-top: 1rem;
 }
 
@@ -485,7 +487,10 @@ h1 {
 
 h2 {
   font-size: 1.8rem;
-  margin-bottom: 1.5rem;
+  margin-top: 0;
+  /* Asegurar que no haya margen extra */
+  margin-bottom: 1rem;
+  /* Reducido ligeramente también */
   color: var(--text-white);
 }
 
