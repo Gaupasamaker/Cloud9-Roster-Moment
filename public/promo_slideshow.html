@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud9 Roster Moment - Promo Loop</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: kenburns 15s infinite;
+        }
+
+        /* Staggered animations for 5 images. Total cycle 15s (3s per image) */
+        .slide:nth-child(1) {
+            animation-delay: 0s;
+            z-index: 5;
+            background-image: url('slideshow_assets/pro_shot_1_the_scan_1768343701808.png');
+        }
+
+        .slide:nth-child(2) {
+            animation-delay: 3s;
+            z-index: 4;
+            background-image: url('slideshow_assets/pro_shot_2_the_reveal_emotion_1768343715816.png');
+        }
+
+        .slide:nth-child(3) {
+            animation-delay: 6s;
+            z-index: 3;
+            background-image: url('slideshow_assets/pro_shot_3_immortalized_scale_1768343730080.png');
+        }
+
+        .slide:nth-child(4) {
+            animation-delay: 9s;
+            z-index: 2;
+            background-image: url('slideshow_assets/pro_shot_4_squad_energy_1768343744748.png');
+        }
+
+        .slide:nth-child(5) {
+            animation-delay: 12s;
+            z-index: 1;
+            background-image: url('slideshow_assets/pro_shot_5_the_invitation_1768343758123.png');
+        }
+
+        @keyframes kenburns {
+            0% {
+                opacity: 0;
+                transform: scale(1);
+            }
+
+            5% {
+                opacity: 1;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            25% {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Overlay Text */
+        .overlay {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            color: white;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slideshow-container">
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="overlay">Roster Moment</div>
+    </div>
+</body>
+
+</html>
