@@ -179,7 +179,7 @@ const screens = {
       ? state.generatedImage
       : `https://cloud9-roster-moment.onrender.com/generated/${state.generatedImageName || ''}`;
 
-    const twitterText = encodeURIComponent(`🎮 Just joined the @Cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment #LEC`);
+    const twitterText = encodeURIComponent(`🎮 Just joined the @Cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment`);
     const twitterUrl = `https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(qrUrl)}`;
 
     return `
@@ -328,7 +328,7 @@ window.downloadImage = () => {
 
 // Compartir en Instagram (copiar texto y mostrar instrucciones)
 window.shareInstagram = () => {
-  const instagramText = `🎮 Just joined the @cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment #LEC #Gaming`;
+  const instagramText = `🎮 Just joined the @cloud9 roster! Check out my Roster Moment! 🏆\n\n#Cloud9 #Esports #RosterMoment #Gaming`;
 
   navigator.clipboard.writeText(instagramText).then(() => {
     alert('✅ Caption copied to clipboard!\n\n1. Download your image using the Download button\n2. Open Instagram and create a new post\n3. Select your poster image\n4. Paste the caption (Ctrl+V / Cmd+V)');
