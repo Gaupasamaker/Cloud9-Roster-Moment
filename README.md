@@ -22,7 +22,7 @@ Fans simply upload a photo or take a selfie, and within seconds, they receive a 
 
 ## 🛠️ Technology Stack
 
-*   **AI:** Google Gemini 1.5 Pro (Vertex AI / Studio SDK) - *Multimodal image generation & blending*
+*   **AI:** Jetbrain + Google Gemini 1.5 Pro - *Multimodal image generation & blending*
 *   **Frontend:** Vanilla JavaScript, HTML5, CSS3 - *Mobile-first SPA*
 *   **Backend:** Node.js, Express - *API orchestration & file management*
 *   **Database:** SQLite (better-sqlite3) - *Local data persistence & gallery management*
@@ -93,7 +93,7 @@ The frontend will launch (usually at `http://localhost:5173`).
 
 ## 🏆 Hackathon Context
 
-This project was built for the **Google Cloud Vertex AI Agent Builder Hackathon** (2025/2026). It demonstrates the power of multimodal AI in creating personalized, real-time brand experiences.
+This project was built for the **Sky’s the Limit - Cloud9 x JetBrains Hackathon**. It demonstrates the power of multimodal AI in creating personalized, real-time brand experiences.
 
 **Team:**
 *   Jon Llaguno
